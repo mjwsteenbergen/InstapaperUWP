@@ -1,0 +1,28 @@
+﻿<Page
+    x:Class="Instapaper.LoginPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Instapaper"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Image Source="https://source.unsplash.com/1600x900/?book" Stretch="UniformToFill" HorizontalAlignment="Center"/>
+        <Grid Background="{ThemeResource SystemAltMediumHighColor}">
+            <StackPanel Background="{ThemeResource SystemAltHighColor}" Width="400" Height="600" Padding="20">
+                <TextBlock Text="Instapaper" Style="{ThemeResource HeaderTextBlockStyle}" />
+                <TextBlock Text="Instapaper OAuth Token" Margin="0,20,0,0"/>
+                <TextBox x:Name="clientId"/>
+                <TextBlock Text="Instapaper OAuth SecretToken" Margin="0,10,0,0"/>
+                <TextBox x:Name="clientSecret"/>
+                <TextBlock Text="Instapaper User Token" Margin="0,10,0,0"/>
+                <TextBox x:Name="userToken"/>
+                <TextBlock Text="Instapaper User SecretToken" Margin="0,10,0,0"/>
+                <TextBox x:Name="userSecret"/>
+                <Button Margin="0,30" Tapped="Button_Tapped">Login</Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
