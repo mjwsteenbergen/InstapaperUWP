@@ -58,6 +58,22 @@ namespace Instapaper
         {
             switch(htmlNode.Name)
             {
+                case "iframe":
+                    var wv = new WebView(WebViewExecutionMode.SeparateThread);
+                    wv.Width = 1000;
+                    wv.Height = 562.5;
+                    wv.Navigate(new Uri(htmlNode.Attributes.FirstOrDefault(i => i.Name == "src").Value));
+                    wv.NavigationCompleted += async (s, e) =>
+                    {
+                        var heightString = await s.InvokeScriptAsync("eval", new[] { "document.body.scrollHeight.toString()" });
+                        int height;
+                        if (int.TryParse(heightString, out height))
+                        {
+                            s.Height = height;
+                        };
+                    };
+
+                    return state.PushInSingleParagraph(wv);
                 case "h1":
                     return state.PushInSingleParagraph(new Run
                     {
@@ -89,6 +105,9 @@ namespace Instapaper
                         FontWeight = FontWeights.SemiBold,
                         FontSize = 13 * settings.SizeModifier,
                     });
+                case "p":
+                    state.CloseParagraph();
+                    return state.Push(new Span(), htmlNode);
                 case "ol":
                     return ToOrderedList(htmlNode, state);
                 case "ul":
@@ -194,6 +213,11 @@ namespace Instapaper
                 return this;
             }
 
+            internal State PushInSingleParagraph(WebView wv)
+            {
+                return PushInSingleParagraph(WrapInContainer(wv));
+            }
+
             internal State Push(Inline inline, Paragraph p = null)
             {
                 mygraph = GetParagraph(p);
@@ -269,6 +293,8 @@ namespace Instapaper
                     myspan = null;
                 }
             }
+
+            
         }
 
         private static State ToOrderedList(HtmlNode htmlNode, State state)
