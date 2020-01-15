@@ -84,12 +84,13 @@ namespace Instapaper
             var scaleFactor = DisplayInformation.GetForCurrentView();
             scaleFactor.OrientationChanged += (s, ex) =>
             {
-                if (s.NativeOrientation == DisplayOrientations.Portrait || s.NativeOrientation == DisplayOrientations.Portrait)
-                {
-                    ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-                } else
+                if (s.CurrentOrientation == DisplayOrientations.Landscape || s.CurrentOrientation == DisplayOrientations.LandscapeFlipped)
                 {
                     ApplicationView.GetForCurrentView().ExitFullScreenMode();
+                }
+                else
+                {
+                    ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
                 }
 
             };
@@ -122,6 +123,7 @@ namespace Instapaper
                 Html = Html.Replace(i.text, $"<mark>{i.text}</mark>");
             });
 
+            RichTextListview.ScrollIntoView(RichTextListview.Items.FirstOrDefault());
 
             HtmlRichTextBlockv3.SetHtml(RichText, Html);
         }
