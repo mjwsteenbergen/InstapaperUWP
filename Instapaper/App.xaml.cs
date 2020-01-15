@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -42,6 +45,8 @@ namespace Instapaper
         protected override async void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
+
+            AppCenter.Start("f129a233-54a5-45e5-9b7f-eb912411846f", typeof(Analytics), typeof(Crashes));
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
