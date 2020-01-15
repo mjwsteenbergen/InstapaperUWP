@@ -7,11 +7,11 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="58e71061-02bd-40c2-9270-4c03d9d03ddc"
+    Name="66227168-c66e-4ce5-a54e-526c857ceb52"
     Publisher="CN=martijn"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="58e71061-02bd-40c2-9270-4c03d9d03ddc" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="66227168-c66e-4ce5-a54e-526c857ceb52" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
     <DisplayName>Instapaper</DisplayName>

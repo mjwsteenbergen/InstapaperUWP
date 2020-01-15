@@ -1,12 +1,8 @@
-﻿using Microsoft.AppCenter;
-using Microsoft.AppCenter.Analytics;
-using Microsoft.AppCenter.Crashes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
@@ -18,7 +14,6 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Memory = Martijn.Extensions.Memory.Memory;
 
 namespace Instapaper
 {
@@ -42,11 +37,9 @@ namespace Instapaper
         /// will be used such as when the application is launched to open a specific file.
         /// </summary>
         /// <param name="e">Details about the launch request and process.</param>
-        protected override async void OnLaunched(LaunchActivatedEventArgs e)
+        protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
-
-            AppCenter.Start("f129a233-54a5-45e5-9b7f-eb912411846f", typeof(Analytics), typeof(Crashes));
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
@@ -70,21 +63,10 @@ namespace Instapaper
             {
                 if (rootFrame.Content == null)
                 {
-                    var settings = await Settings.LoadSettings();
-
-                    if(settings.Instaper_user_secret == null)
-                    {
-                        rootFrame.Navigate(typeof(LoginPage), e.Arguments);
-                    }
-                    else
-                    {
-                        rootFrame.Navigate(typeof(ArticlePage), e.Arguments);
-                    }
-
-
                     // When the navigation stack isn't restored navigate to the first page,
                     // configuring the new page by passing required information as a navigation
                     // parameter
+                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
                 }
                 // Ensure the current window is active
                 Window.Current.Activate();
