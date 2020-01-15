@@ -54,7 +54,6 @@ namespace Instapaper
         public ArticlePage()
         {
             this.InitializeComponent();
-            HtmlToRichTextBlock.el = this;
             Bookmarks = new ObservableCollection<Bookmark>();
         }
 
@@ -72,7 +71,7 @@ namespace Instapaper
             coreTitleBar.ExtendViewIntoTitleBar = true;
             var currentView = SystemNavigationManager.GetForCurrentView();
             currentView.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            Window.Current.SizeChanged += (s, e) =>
+            Window.Current.SizeChanged += (s, ex) =>
             {
                 BookmarkList.Visibility = ApplicationView.GetForCurrentView().IsFullScreenMode ? Visibility.Collapsed : Visibility.Visible;
             };
@@ -83,7 +82,7 @@ namespace Instapaper
             Instapaper.StoreBookmarks();
 
             var scaleFactor = DisplayInformation.GetForCurrentView();
-            scaleFactor.OrientationChanged += (s, e) =>
+            scaleFactor.OrientationChanged += (s, ex) =>
             {
                 if (s.NativeOrientation == DisplayOrientations.Portrait || s.NativeOrientation == DisplayOrientations.Portrait)
                 {

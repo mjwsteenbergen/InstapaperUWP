@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using Windows.UI;
@@ -163,7 +164,7 @@ namespace Instapaper
 
             internal State Push(Run run)
             {
-                myspan ??= new Span();
+                myspan = myspan ?? new Span();
 
                 if (run != null)
                 {
@@ -337,5 +338,65 @@ namespace Instapaper
             };
         }
 
+    }
+
+    public static class StringExtensions
+    {
+        public static string ForceEnd(this string strin, string c)
+        {
+            var stri = strin.Trim(' ');
+
+            if (!stri.EndsWith(c))
+            {
+                stri = stri + c;
+            }
+
+            return stri;
+        }
+
+        public static string ForceStart(this string strin, string c)
+        {
+            var stri = strin.Trim(' ');
+
+            if (!stri.StartsWith(c))
+            {
+                stri = c + stri;
+            }
+
+            return stri;
+        }
+
+        public static string ToSentenceCase(this string input)
+        {
+            var allcapital = input.All(i => char.IsLetter(i) ? char.IsUpper(i) : true);
+
+            if (allcapital)
+            {
+                var lowerCase = input.ToLower();
+                // matches the first sentence of a string, as well as subsequent sentences
+                var r = new Regex(@"(^[a-z])|\.\s+(.)", RegexOptions.ExplicitCapture);
+                // MatchEvaluator delegate defines replacement of setence starts to uppercase
+                return r.Replace(lowerCase, s => s.Value.ToUpper());
+            }
+            else
+            {
+                return input;
+            }
+        }
+
+        public static bool IsReallyEmpty(this string input)
+        {
+            return string.IsNullOrEmpty(input?.Trim(' ', '\t', '\n', '\r'));
+        }
+
+        public static string MakeStartReallyEmpty(this string input)
+        {
+            return input?.TrimStart(' ', '\t', '\n', '\r');
+        }
+
+        public static string TrimReally(this string input)
+        {
+            return input?.Trim(' ', '\t', '\n', '\r');
+        }
     }
 }

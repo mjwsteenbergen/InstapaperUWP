@@ -29,7 +29,7 @@ namespace Instapaper
             {
                 if (e.PropertyName == "Text")
                 {
-                    HtmlToRichTextBlock.SetHtml(RichText, Text);
+                    HtmlRichTextBlockv3.SetHtml(RichText, Text);
                 }
             };
         }
