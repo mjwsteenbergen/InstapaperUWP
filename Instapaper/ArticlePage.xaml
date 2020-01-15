@@ -38,8 +38,8 @@
         </Grid>
         <Grid Grid.Column="1">
             <Grid>
-                
-                <ListView VerticalAlignment="Top" SelectionMode="None" Grid.Row="1">
+
+                <ListView VerticalAlignment="Top" SelectionMode="None" Grid.Row="1"  x:Name="RichTextListview">
                     <ListView.Header>
                         <controls:ScrollHeader Mode="QuickReturn">
                             <Grid Background="{ThemeResource SystemAltHighColor}">
@@ -59,6 +59,7 @@
                         </controls:ScrollHeader>
                     </ListView.Header>
                     <ListView.Items>
+                        <ListViewItem/>
                         <ListViewItem SizeChanged="MakeGridHaveAllSpace">
                             <Grid x:Name="RichTextBlockGrid">
                                 <Grid.ColumnDefinitions>
