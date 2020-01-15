@@ -1,4 +1,5 @@
-﻿using ApiLibs.Instapaper;
+using ApiLibs.General;
+using ApiLibs.Instapaper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,37 +20,23 @@ namespace Instapaper
 
         public async void StoreBookmarks()
         {
-            var bms = await Instapaper.GetBookmarks(null, 50);
-
-            await mem.Write("bookmarks", bms);
-
-            foreach (var i in bms)
+            try
             {
-                try
-                {
-                    await mem.Read($"html-{i.bookmark_id}");
-                }
-                catch
-                {
-                    try
-                    {
-                        await mem.Write($"html-{i.bookmark_id}", await Instapaper.GetHTML(i));
-                    } catch { }
-                }
+                var bms = await Instapaper.GetBookmarks(null, 50);
 
-                try
-                {
-                    await mem.Read($"highlights-{i.bookmark_id}");
-                }
-                catch
+                await mem.Write("bookmarks", bms);
+
+                foreach (var i in bms)
                 {
                     try
                     {
-                        await mem.Write($"highlights-{i.bookmark_id}", await Instapaper.GetHighlights(i));
-                    }
-                    catch { }
+                        await mem.ReadOrCalculate($"html-{i.bookmark_id}", () => Instapaper.GetHTML(i));
+                    } catch { }
+                    await mem.ReadOrCalculate($"highlights-{i.bookmark_id}", () => Instapaper.GetHighlights(i));
                 }
-            }
+            } 
+            catch(NoInternetException) {}
+            
         }
 
         public async Task<List<Bookmark>> GetBookmarks()
