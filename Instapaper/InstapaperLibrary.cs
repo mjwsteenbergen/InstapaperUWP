@@ -1,9 +1,11 @@
-using ApiLibs.General;
+﻿using ApiLibs.General;
 using ApiLibs.Instapaper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Instapaper
@@ -74,9 +76,76 @@ namespace Instapaper
                 return new List<Highlight>();
             }
         }
+
+        public async Task Archive(Bookmark bookmark)
+        {
+            var act = new InstapaperAction
+            {
+                Bookmark = bookmark.bookmark_id,
+                Action = ActionType.Archive
+            };
+
+            await act.TryToExecute();
+        }
     }
 
     public class InstapaperAction {
-        
+        public int Bookmark { get; set; }
+        public ActionType Action { get; set; }
+
+        [JsonIgnore]
+        public InstapaperService Instapaper { get; set; }
+
+        internal async Task Execute()
+        {
+            switch(Action)
+            {
+                case ActionType.Archive:
+                    Instapaper.ArchiveBookmark(Bookmark);
+                    break;
+                case ActionType.UnArchive:
+                    await Instapaper.UnarchiveBookmark(Bookmark);
+                    break;
+                case ActionType.Star:
+                    Instapaper.StarBookmark(Bookmark);
+                    break;
+                case ActionType.UnStar:
+                    Instapaper.UnstarBookmark(Bookmark);
+                    break;
+                case ActionType.Delete:
+                    await Instapaper.DeleteBookmark(Bookmark);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        internal async Task TryToExecute()
+        {
+            try
+            {
+                await Execute();
+            }
+            catch
+            {
+                await Save();
+            }
+        }
+
+        private async Task Save()
+        {
+            LocalMemory mem = new LocalMemory();
+            var actions = await mem.Read("actions.json", new List<InstapaperAction>());
+            actions.Add(this);
+            await mem.Write("actions.json", actions);
+        }
+    }
+
+    public enum ActionType
+    {
+        Archive, UnArchive,
+        Star,
+        UnStar,
+        Delete
     }
 }
