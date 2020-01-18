@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Martijn.Extensions.Linq;
+using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,10 @@ namespace Instapaper
             }
             catch (Exception e)
             {
-
+                Crashes.TrackError(e, new Dictionary<string, string>
+                {
+                    { "type","HtmlRichTextBlockv3" }
+                });
             }
 
 
