@@ -35,6 +35,8 @@ namespace Instapaper
 
         public ObservableCollection<Bookmark> Bookmarks { get; set; }
 
+        public Bookmark SelectedBookmark { get; set; }
+
         public async Task Initiate()
         {
             Window.Current.SizeChanged += (s, ex) =>
@@ -42,8 +44,18 @@ namespace Instapaper
                 this.ItemsPane.IsPaneOpen = !ApplicationView.GetForCurrentView().IsFullScreenMode;
             };
 
+            await SetBookmarks();
+        }
 
-            var bm = (await Instapaper.GetBookmarks()).Select(i =>
+        private async Task SetBookmarks()
+        {
+            Bookmarks.Clear();
+
+            List<Bookmark> list = await Instapaper.GetBookmarks();
+
+            Instapaper.StoreBookmarks(list);
+
+            var bm = list.Select(i =>
             {
                 i.title = HttpUtility.HtmlDecode(i.title);
                 return i;
@@ -60,6 +72,7 @@ namespace Instapaper
             }
 
             var bm = e.AddedItems.First() as Bookmark;
+            SelectedBookmark = bm;
             var html = await Instapaper.GetHtml(bm);
             var highlights = await Instapaper.GetHighlights(bm);
             highlights.OrderBy(i => i.position).Foreach(i =>
@@ -99,8 +112,23 @@ namespace Instapaper
         private void MakeGridHaveAllSpace(object sender, SizeChangedEventArgs e)
         {
             ListViewItem listViewItem = (sender as ListViewItem);
-            ArticleControl.Width = listViewItem.ActualWidth;
+            ArticleWrapGrid.Width = listViewItem.ActualWidth;
 
+        }
+
+        private async void Archive(object sender, RoutedEventArgs e)
+        {
+            await Instapaper.Archive(SelectedBookmark);
+        }
+
+        private async void Star(object sender, RoutedEventArgs e)
+        {
+            await Instapaper.Star(SelectedBookmark);
+        }
+
+        private async void Delete(object sender, RoutedEventArgs e)
+        {
+            await Instapaper.Delete(SelectedBookmark);
         }
     }
 }

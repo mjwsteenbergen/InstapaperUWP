@@ -130,9 +130,6 @@
     <Compile Include="Article.xaml.cs">
       <DependentUpon>Article.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ArticlePage - Copy.xaml.cs">
-      <DependentUpon>ArticlePage - Copy.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ArticlePage.xaml.cs">
       <DependentUpon>ArticlePage.xaml</DependentUpon>
     </Compile>
@@ -176,10 +173,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ArticlePage - Copy.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="ArticlePage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -222,9 +215,6 @@
     <PackageReference Include="WindowsAppStudio.Uwp">
       <Version>1.5.3</Version>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Instapaper_TemporaryKey.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

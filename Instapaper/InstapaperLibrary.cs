@@ -20,11 +20,11 @@ namespace Instapaper
         public InstapaperService Instapaper { get; }
         public LocalMemory mem = new LocalMemory();
 
-        public async void StoreBookmarks()
+        public async void StoreBookmarks(List<Bookmark> bms = null)
         {
             try
             {
-                var bms = await Instapaper.GetBookmarks(null, 50);
+                bms = bms ?? await Instapaper.GetBookmarks(null, 50);
 
                 await mem.Write("bookmarks", bms);
 
@@ -45,7 +45,7 @@ namespace Instapaper
         {
             try
             {
-                return await Instapaper.GetBookmarks(null, 50);
+                return await Instapaper.GetBookmarks(null, 60);
             }
             catch
             {
@@ -79,66 +79,80 @@ namespace Instapaper
 
         public async Task Archive(Bookmark bookmark)
         {
-            var act = new InstapaperAction
+            await Execute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Archive
-            };
+            });
+        }
 
-            await act.TryToExecute();
+        public async Task Star(Bookmark bookmark)
+        {
+            await Execute(new InstapaperAction
+            {
+                Bookmark = bookmark.bookmark_id,
+                Action = ActionType.Star
+            });
+        }
+
+        public async Task Delete(Bookmark bookmark)
+        {
+            await Execute(new InstapaperAction
+            {
+                Bookmark = bookmark.bookmark_id,
+                Action = ActionType.Delete
+            });
+        }
+
+
+        internal async Task TryToExecute(InstapaperAction action)
+        {
+            try
+            {
+                await Execute(action);
+            }
+            catch
+            {
+                await Save(action);
+            }
+        }
+
+        private async Task Save(InstapaperAction action)
+        {
+            LocalMemory mem = new LocalMemory();
+            var actions = await mem.Read("actions.json", new List<InstapaperAction>());
+            actions.Add(action);
+            await mem.Write("actions.json", actions);
+        }
+
+        internal async Task Execute(InstapaperAction action)
+        {
+            switch (action.Action)
+            {
+                case ActionType.Archive:
+                    Instapaper.ArchiveBookmark(action.Bookmark);
+                    break;
+                case ActionType.UnArchive:
+                    await Instapaper.UnarchiveBookmark(action.Bookmark);
+                    break;
+                case ActionType.Star:
+                    Instapaper.StarBookmark(action.Bookmark);
+                    break;
+                case ActionType.UnStar:
+                    Instapaper.UnstarBookmark(action.Bookmark);
+                    break;
+                case ActionType.Delete:
+                    await Instapaper.DeleteBookmark(action.Bookmark);
+                    break;
+                default:
+                    break;
+            }
         }
     }
 
     public class InstapaperAction {
         public int Bookmark { get; set; }
         public ActionType Action { get; set; }
-
-        [JsonIgnore]
-        public InstapaperService Instapaper { get; set; }
-
-        internal async Task Execute()
-        {
-            switch(Action)
-            {
-                case ActionType.Archive:
-                    Instapaper.ArchiveBookmark(Bookmark);
-                    break;
-                case ActionType.UnArchive:
-                    await Instapaper.UnarchiveBookmark(Bookmark);
-                    break;
-                case ActionType.Star:
-                    Instapaper.StarBookmark(Bookmark);
-                    break;
-                case ActionType.UnStar:
-                    Instapaper.UnstarBookmark(Bookmark);
-                    break;
-                case ActionType.Delete:
-                    await Instapaper.DeleteBookmark(Bookmark);
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        internal async Task TryToExecute()
-        {
-            try
-            {
-                await Execute();
-            }
-            catch
-            {
-                await Save();
-            }
-        }
-
-        private async Task Save()
-        {
-            LocalMemory mem = new LocalMemory();
-            var actions = await mem.Read("actions.json", new List<InstapaperAction>());
-            actions.Add(this);
-            await mem.Write("actions.json", actions);
-        }
     }
 
     public enum ActionType
