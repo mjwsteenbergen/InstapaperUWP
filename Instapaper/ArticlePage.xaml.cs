@@ -103,9 +103,6 @@ namespace Instapaper
             {
                 this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
             };
-
-
-            Instapaper.StoreBookmarks();
         }
     }
 }

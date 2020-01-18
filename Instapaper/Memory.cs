@@ -1,6 +1,7 @@
 ﻿using Martijn.Extensions.Memory;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,12 +21,7 @@ namespace Instapaper
 
         public override async Task WriteString(string filePath, string text)
         {
-            try
-            {
-                await ApplicationDataPath.CreateFileAsync(filePath, CreationCollisionOption.FailIfExists);
-            }
-            catch { }
-            StorageFile file = await ApplicationDataPath.GetFileAsync(filePath);
+            StorageFile file = await ApplicationDataPath.CreateFileAsync(filePath, CreationCollisionOption.OpenIfExists);
             await FileIO.WriteTextAsync(file, text);
         }
     }
