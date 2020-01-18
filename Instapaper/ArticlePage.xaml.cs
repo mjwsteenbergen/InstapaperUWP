@@ -71,16 +71,20 @@ namespace Instapaper
             coreTitleBar.ExtendViewIntoTitleBar = true;
             var currentView = SystemNavigationManager.GetForCurrentView();
             currentView.AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            Window.Current.SizeChanged += (s, ex) =>
-            {
-                BookmarkList.Visibility = ApplicationView.GetForCurrentView().IsFullScreenMode ? Visibility.Collapsed : Visibility.Visible;
-            };
 
+            //Launch maximized
+            ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Maximized;
+
+            //Set stuff
             var settigns = await Settings.LoadSettings();
             Instapaper = new InstapaperLibrary(settigns.GenerateService());
 
+            //Set below
+            ContentComponent.Instapaper = Instapaper;
+
             Instapaper.StoreBookmarks();
 
+            //Automatically go to fullscreen mode
             var scaleFactor = DisplayInformation.GetForCurrentView();
             scaleFactor.OrientationChanged += (s, ex) =>
             {
@@ -95,67 +99,13 @@ namespace Instapaper
 
             };
 
-            var bm = (await Instapaper.GetBookmarks()).Select(i => {
-                i.title = HttpUtility.HtmlDecode(i.title);
-                return i;
-            });
 
-            bm.Foreach(i => Bookmarks.Add(i));
-        }
-
-        private async void StackPanel_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            
-        }
-
-        private async void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if(e.AddedItems.Count == 0)
+            Window.Current.SizeChanged += (s, ex) =>
             {
-                return;
-            }
-            
-            var bm = e.AddedItems.First() as Bookmark;
-            Html = await Instapaper.GetHtml(bm);
-            var highlights = await Instapaper.GetHighlights(bm);
-            highlights.OrderBy(i => i.position).Foreach(i =>
-            {
-                Html = Html.Replace(i.text, $"<mark>{i.text}</mark>");
-            });
+                this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
+            };
 
-            RichTextListview.ScrollIntoView(RichTextListview.Items.FirstOrDefault());
-
-            HtmlRichTextBlockv3.SetHtml(RichText, Html);
-        }
-
-        private void FullscreenToggle(object sender, RoutedEventArgs e)
-        {
-            if(ApplicationView.GetForCurrentView().IsFullScreenMode)
-            {
-                ExitFullscreen();
-            } else
-            {
-                EnterFullscreen();
-            }
-        }
-
-        private void EnterFullscreen()
-        {
-            BarButtonStackpanel.Margin = new Thickness(0, 0, 0, 0);
-            ApplicationView.GetForCurrentView().TryEnterFullScreenMode();
-        }
-
-        private void ExitFullscreen()
-        {
-            BarButtonStackpanel.Margin = new Thickness(0, 32, 0, 0);
-            ApplicationView.GetForCurrentView().ExitFullScreenMode();
-        }
-
-        private void MakeGridHaveAllSpace(object sender, SizeChangedEventArgs e)
-        {
-            ListViewItem listViewItem = (sender as ListViewItem);
-            RichTextBlockGrid.Width = listViewItem.ActualWidth;
-            
+            await ContentComponent.Initiate();
         }
     }
 }

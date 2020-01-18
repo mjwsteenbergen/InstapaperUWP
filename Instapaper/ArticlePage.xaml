@@ -9,81 +9,32 @@
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:common="using:AppStudio.Uwp.Controls" xmlns:muxc="using:Windows.UI.Xaml.Controls"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Loaded="Load">
 
-    <Grid x:Name="mainGrid" Loaded="Load">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid Background="{ThemeResource SystemChromeLowColor}" Grid.Row="1" x:Name="BookmarkList">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <TextBlock Text="My Articles" Style="{ThemeResource HeaderTextBlockStyle}" Margin="20,0" FontWeight="Normal"/>
-            <ListView Grid.Row="1" ItemsSource="{x:Bind Bookmarks}" SelectionChanged="ListView_SelectionChanged" Margin="0, 0, 0, 0">
-                <ListView.ItemTemplate>
-                    <DataTemplate x:DataType="apilibs:Bookmark">
-                        <StackPanel Tapped="StackPanel_Tapped" MaxWidth="500" Margin="5, 0">
-                            <TextBlock Text="{x:Bind title}" Margin="0,10,0,0" TextWrapping="NoWrap" FontSize="23" FontWeight="SemiLight"/>
-                            <TextBlock Text="Todo: converter" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,10"/>
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-        </Grid>
-        <Grid Grid.Column="1">
-            <Grid>
-
-                <ListView VerticalAlignment="Top" SelectionMode="None" Grid.Row="1"  x:Name="RichTextListview">
-                    <ListView.Header>
-                        <controls:ScrollHeader Mode="QuickReturn">
-                            <Grid Background="{ThemeResource SystemAltHighColor}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Style="{StaticResource HeaderTextBlockStyle}" Text="Instapaper" Margin="20, 0" Grid.RowSpan="2"/>
-                                <StackPanel x:Name="BarButtonStackpanel" Grid.Column="2" Margin="0,32,0,0" Orientation="Horizontal">
-                                    <AppBarButton Icon="FullScreen" Label="Fullscreen" Click="FullscreenToggle"/>
-                                    <AppBarButton Icon="Delete" Label="Fullscreen"/>
-                                    <AppBarButton Icon="MoveToFolder"/>
-                                    <AppBarButton Icon="Favorite"/>
-                                </StackPanel>
-                            </Grid>
-                        </controls:ScrollHeader>
-                    </ListView.Header>
-                    <ListView.Items>
-                        <ListViewItem/>
-                        <ListViewItem SizeChanged="MakeGridHaveAllSpace">
-                            <Grid x:Name="RichTextBlockGrid">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <RichTextBlock Grid.Column="1" x:Name="RichText" MaxWidth="1000" VerticalAlignment="Center" IsTextSelectionEnabled="True">
-                                    <RichTextBlock.SelectionFlyout>
-                                        <muxc:CommandBarFlyout Placement="Top">
-                                            <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" />
-                                        </muxc:CommandBarFlyout>
-                                    </RichTextBlock.SelectionFlyout>
-                                </RichTextBlock>
-                            </Grid>
-                        </ListViewItem>
-                    </ListView.Items>
-                </ListView>
+    <SplitView x:Name="main" PaneBackground="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
+           IsPaneOpen="False" DisplayMode="CompactOverlay" CompactPaneLength="40">
+        <SplitView.Pane>
+            <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!--<TextBlock Text="PANE CONTENT" x:Name="PaneHeader" Margin="60,12,0,0" Style="{StaticResource BaseTextBlockStyle}"/>-->
+                <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,30,0,24">
+                    <AppBarButton Width="40" Height="40" Style="{StaticResource AppBarButtonRevealStyle}" Icon="GlobalNavigationButton"/>
+                    <TextBlock Text="Settings" Margin="24,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Grid Grid.Row="2"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="14,24,0,24" >
+                    <SymbolIcon Symbol="Setting" />
+                    <TextBlock Text="Settings" Margin="24,0,0,0" VerticalAlignment="Center"/>
+                </StackPanel>
             </Grid>
-            <!--<TextBox x:Name="FFS" Grid.Row="2"/>-->
-            
-        </Grid>
-        
+        </SplitView.Pane>
 
-
-    </Grid>
+        <local:ContentControl x:Name="ContentComponent"/>
+    </SplitView>
 </Page>

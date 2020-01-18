@@ -18,40 +18,20 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Instapaper
 {
-    public sealed partial class Article : UserControl, INotifyPropertyChanged
+    public sealed partial class Article : UserControl
     {
         
 
         public Article()
         {
             this.InitializeComponent();
-            this.PropertyChanged += (sender, e) =>
-            {
-                if (e.PropertyName == "Text")
-                {
-                    HtmlRichTextBlockv3.SetHtml(RichText, Text);
-                }
-            };
         }
 
-        private string _text;
-        public string Text
+        public void SetText(string html)
         {
-            get { return _text; }
-            set
-            {
-                if (_text == value) return;
-
-                _text = value;
-                NotifyPropertyChanged(nameof(Text));
-            }
+            HtmlRichTextBlockv3.SetHtml(RichText, html);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged(string info)
-        {
-            if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(info));
-        }
+
     }
 }

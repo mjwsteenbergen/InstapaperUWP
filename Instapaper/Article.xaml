@@ -5,15 +5,24 @@
     xmlns:local="using:Instapaper"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:muxc="using:Windows.UI.Xaml.Controls"
-    mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
+    mc:Ignorable="d">
 
-    <RichTextBlock x:Name="RichText" MaxWidth="800" IsTextSelectionEnabled="True">
-        <RichTextBlock.SelectionFlyout>
-            <muxc:CommandBarFlyout Placement="Top">
-                <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" />
-            </muxc:CommandBarFlyout>
-        </RichTextBlock.SelectionFlyout>
-    </RichTextBlock>
+    <Grid x:Name="RichTextBlockGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            
+        </Grid>
+        <RichTextBlock Grid.Column="1" x:Name="RichText" VerticalAlignment="Center" IsTextSelectionEnabled="True">
+            <RichTextBlock.SelectionFlyout>
+                <muxc:CommandBarFlyout Placement="Top">
+                    <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" />
+                </muxc:CommandBarFlyout>
+            </RichTextBlock.SelectionFlyout>
+        </RichTextBlock>
+        <Grid Grid.Column="2"/>
+    </Grid>
 </UserControl>

@@ -130,8 +130,14 @@
     <Compile Include="Article.xaml.cs">
       <DependentUpon>Article.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ArticlePage - Copy.xaml.cs">
+      <DependentUpon>ArticlePage - Copy.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ArticlePage.xaml.cs">
       <DependentUpon>ArticlePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ContentControl.xaml.cs">
+      <DependentUpon>ContentControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="HtmlRichTextBlockv3.cs" />
     <Compile Include="InstapaperLibrary.cs" />
@@ -170,7 +176,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="ArticlePage - Copy.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="ArticlePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ContentControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
