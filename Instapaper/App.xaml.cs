@@ -48,6 +48,11 @@ namespace Instapaper
 
             AppCenter.Start("f129a233-54a5-45e5-9b7f-eb912411846f", typeof(Analytics), typeof(Crashes));
 
+            this.UnhandledException += (sender, ex) =>
+            {
+                Crashes.TrackError(ex.Exception);
+            };
+
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (rootFrame == null)
