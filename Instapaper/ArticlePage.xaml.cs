@@ -81,8 +81,7 @@ namespace Instapaper
 
             //Set below
             ContentComponent.Instapaper = Instapaper;
-
-            Instapaper.StoreBookmarks();
+            await ContentComponent.Initiate();
 
             //Automatically go to fullscreen mode
             var scaleFactor = DisplayInformation.GetForCurrentView();
@@ -105,7 +104,8 @@ namespace Instapaper
                 this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
             };
 
-            await ContentComponent.Initiate();
+
+            Instapaper.StoreBookmarks();
         }
     }
 }
