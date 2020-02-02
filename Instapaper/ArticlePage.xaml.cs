@@ -81,6 +81,7 @@ namespace Instapaper
 
             //Set below
             ContentComponent.Instapaper = Instapaper;
+            ContentComponent.Settings = settigns;
             await ContentComponent.Initiate();
 
             //Automatically go to fullscreen mode
