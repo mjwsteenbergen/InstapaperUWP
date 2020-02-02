@@ -14,15 +14,16 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            
+
         </Grid>
-        <RichTextBlock Grid.Column="1" x:Name="RichText" VerticalAlignment="Center" IsTextSelectionEnabled="True">
+        <RichTextBlock Grid.Column="1" HorizontalAlignment="Center" x:Name="RichText"  IsTextSelectionEnabled="True">
             <RichTextBlock.SelectionFlyout>
                 <muxc:CommandBarFlyout Placement="Top">
                     <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" />
                 </muxc:CommandBarFlyout>
             </RichTextBlock.SelectionFlyout>
         </RichTextBlock>
+        <TextBlock Margin="-200,0,0,0" x:Name="Tree" TextWrapping="NoWrap" Grid.Column="0"/>
         <Grid Grid.Column="2"/>
     </Grid>
 </UserControl>

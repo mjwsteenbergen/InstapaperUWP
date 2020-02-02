@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -29,7 +29,9 @@ namespace Instapaper
 
         public void SetText(string html)
         {
-            HtmlRichTextBlockv3.SetHtml(RichText, html);
+#if DEBUG
+            Tree.Text = ParagraphTree.Parse(res);
+#endif
         }
 
 
