@@ -36,6 +36,7 @@ namespace Instapaper
         public ObservableCollection<Bookmark> Bookmarks { get; set; }
 
         public Bookmark SelectedBookmark { get; set; }
+        internal Settings Settings { get; set; }
 
         public async Task Initiate()
         {
@@ -49,11 +50,15 @@ namespace Instapaper
 
         private async Task SetBookmarks()
         {
+            await UpdateBookMarksInView();
+            await Instapaper.StoreBookmarks(Settings.DownloadSettings);
+        }
+
+        public async Task UpdateBookMarksInView()
+        {
             Bookmarks.Clear();
 
-            List<Bookmark> list = await Instapaper.GetBookmarks();
-
-            Instapaper.StoreBookmarks(list);
+            var list = await Instapaper.GetBookmarks(Settings.FolderId);
 
             var bm = list.Select(i =>
             {
@@ -118,17 +123,29 @@ namespace Instapaper
 
         private async void Archive(object sender, RoutedEventArgs e)
         {
+            if(SelectedBookmark == null) { return; }
             await Instapaper.Archive(SelectedBookmark);
+            Bookmarks.Remove(SelectedBookmark);
+            ArticleControl.SetText(null);
+            SelectedBookmark = null;
         }
 
         private async void Star(object sender, RoutedEventArgs e)
         {
+            if(SelectedBookmark == null) { return; }
             await Instapaper.Star(SelectedBookmark);
+            Bookmarks.Remove(SelectedBookmark);
+            ArticleControl.SetText(null);
+            SelectedBookmark = null;
         }
 
         private async void Delete(object sender, RoutedEventArgs e)
         {
+            if(SelectedBookmark == null) { return; }
             await Instapaper.Delete(SelectedBookmark);
+            Bookmarks.Remove(SelectedBookmark);
+            ArticleControl.SetText(null);
+            SelectedBookmark = null;
         }
     }
 }
