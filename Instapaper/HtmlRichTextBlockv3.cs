@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Martijn.Extensions.Linq;
+using Martijn.Extensions.Text;
 using Microsoft.AppCenter.Crashes;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace Instapaper
     {
         private static TypographySettings settings;
 
-        public static void SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null)
+        public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null)
         {
             settings = tsettings ?? TypographySettings.GetDefaultSettings();
             richText.Blocks.Clear();
@@ -45,6 +46,7 @@ namespace Instapaper
                 var res = Parse(new State(), childNodes.Where(i => i.Name != "#text").First());
                 res.paragraphs.Add(res.mygraph);
                 res.paragraphs.Foreach(i => richText.Blocks.Add(i));
+                return res.paragraphs;
             }
             catch (Exception e)
             {
@@ -53,6 +55,7 @@ namespace Instapaper
                     { "type","HtmlRichTextBlockv3" }
                 });
             }
+            return null;
 
 
 
@@ -198,7 +201,7 @@ namespace Instapaper
 
             internal State Push(Span inline, HtmlNode htmlNode)
             {
-                CloseSpan();
+                //CloseSpan();
                 myspan = inline;
 
                 foreach(var node in htmlNode.ChildNodes)
@@ -206,7 +209,7 @@ namespace Instapaper
                     Parse(this, node);
                 }
 
-                CloseSpan();
+                //CloseSpan();
                 return this;
             }
 
@@ -313,15 +316,21 @@ namespace Instapaper
                 });
                 state.Push(span);
                 return Parse(state, i);
-            });
+            }).ToList();
             return state;
         }
 
         private static State UnOrderedList(HtmlNode htmlNode, State state)
         {
             Paragraph para = new Paragraph();
-            htmlNode.ChildNodes.Where(i => i.Name == "li").Select((i, j) =>
+
+            foreach (var i in htmlNode.ChildNodes)
             {
+                if(i.Name != "li")
+                {
+                    continue;
+                }
+
                 var span = new Span();
                 span.Inlines.Add(new Run
                 {
@@ -329,8 +338,7 @@ namespace Instapaper
                 });
                 state.Push(span);
                 Parse(state, i);
-                return state;
-            });
+            }
             return state;
         }
 
@@ -427,6 +435,50 @@ namespace Instapaper
         public static string TrimReally(this string input)
         {
             return input?.Trim(' ', '\t', '\n', '\r');
+        }
+    }
+
+    public class ParagraphTree
+    {
+        public static string Parse(List<Paragraph> paragraphs)
+        {
+            if(paragraphs == null)
+            {
+                return "";
+            }
+
+            var res = "";
+
+            foreach (var paragraph in paragraphs)
+            {
+                res += "\nParagraph:\n"+ Parse(paragraph.Inlines, 1);
+            }
+
+            return res;
+        }
+
+        private static string Parse(InlineCollection inlines, int v)
+        {
+            return inlines.Select(i => Parse(i, v)).CombineWithNewLine();
+        }
+
+
+        private static string Parse(Inline inline, int indent)
+        {
+            if(inline is Span span)
+            {
+                return "\t".Repeat(indent) + span.GetType().Name + ":\n" + Parse(span.Inlines, indent+1) + "\n";
+            } 
+            else if (inline is Run run)
+            {
+                return "\t".Repeat(indent) + inline.GetType().Name + ": " + run.Text;
+            }
+            else
+            {
+                return "\t".Repeat(indent) + inline.GetType().Name + ":";
+            }
+
+            
         }
     }
 }
