@@ -20,7 +20,10 @@ namespace Instapaper
 {
     public sealed partial class Article : UserControl
     {
-        
+        public delegate void HighlightHandler(object sender, string highlightedText);
+
+        // Declare the event.
+        public event HighlightHandler TextHighlighted;
 
         public Article()
         {
@@ -40,6 +43,9 @@ namespace Instapaper
 #endif
         }
 
-
+        private void Highlight_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            TextHighlighted.Invoke(this, RichText.SelectedText);
+        }
     }
 }

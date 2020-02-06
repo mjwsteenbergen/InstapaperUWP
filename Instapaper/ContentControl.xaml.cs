@@ -46,6 +46,10 @@ namespace Instapaper
             };
 
             await SetBookmarks();
+            this.ArticleControl.TextHighlighted += async (s, text) =>
+            {
+                await Instapaper.Highlight(SelectedBookmark, text);
+            };
         }
 
         private async Task SetBookmarks()

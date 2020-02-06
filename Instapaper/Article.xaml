@@ -19,7 +19,7 @@
         <RichTextBlock Grid.Column="1" HorizontalAlignment="Center" x:Name="RichText"  IsTextSelectionEnabled="True">
             <RichTextBlock.SelectionFlyout>
                 <muxc:CommandBarFlyout Placement="Top">
-                    <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" />
+                    <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" Tapped="Highlight_Tapped" />
                 </muxc:CommandBarFlyout>
             </RichTextBlock.SelectionFlyout>
         </RichTextBlock>

@@ -132,7 +132,7 @@ namespace Instapaper
 
         public async Task Archive(Bookmark bookmark)
         {
-            await Execute(new InstapaperAction
+            await TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Archive
@@ -141,7 +141,7 @@ namespace Instapaper
 
         public async Task Star(Bookmark bookmark)
         {
-            await Execute(new InstapaperAction
+            await TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Star
@@ -150,10 +150,21 @@ namespace Instapaper
 
         public async Task Delete(Bookmark bookmark)
         {
-            await Execute(new InstapaperAction
+            await TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Delete
+            });
+        }
+
+
+        public Task Highlight(Bookmark selectedBookmark, string text)
+        {
+            return TryToExecute(new InstapaperAction
+            {
+                Action = ActionType.Highlight,
+                Bookmark = selectedBookmark.bookmark_id,
+                Text = text
             });
         }
 
@@ -183,7 +194,7 @@ namespace Instapaper
             LocalMemory mem = new LocalMemory();
             var actions = await mem.Read("actions.json", new List<InstapaperAction>());
             await Task.WhenAll(actions.Select(i => Execute(i)));
-            await mem.Write("actions.json", actions);
+            await mem.Write("actions.json", new List<InstapaperAction>());
         }
 
         internal async Task Execute(InstapaperAction action)
@@ -206,7 +217,7 @@ namespace Instapaper
                     await Instapaper.DeleteBookmark(action.Bookmark);
                     break;
                 case ActionType.Highlight:
-                    //await Instapaper.GetHighlights
+                    await Instapaper.AddHighlight(action.Bookmark, action.Text);
                     break;
                 default:
                     break;
@@ -217,6 +228,7 @@ namespace Instapaper
     public class InstapaperAction {
         public int Bookmark { get; set; }
         public ActionType Action { get; set; }
+        public string Text { get; internal set; }
     }
 
     public enum ActionType
