@@ -20,9 +20,9 @@ using Windows.UI.Xaml.Media.Imaging;
 
 namespace Instapaper
 {
-    class HtmlRichTextBlockv3
+    public class HtmlRichTextBlockv3
     {
-        private static TypographySettings settings;
+        public static TypographySettings settings;
 
         public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null)
         {
@@ -61,7 +61,7 @@ namespace Instapaper
 
         }
 
-        private static State Parse(State state, HtmlNode htmlNode)
+        public static State Parse(State state, HtmlNode htmlNode)
         {
             switch(htmlNode.Name)
             {
@@ -157,7 +157,7 @@ namespace Instapaper
                     return state.Push( new Run
                     {
                         Text = htmlNode.InnerText.TrimReally(),
-                        FontSize = 11 * settings.SizeModifier
+                        FontSize = (int) (11 * settings.SizeModifier)
                     });
                 case "#text":
                     return state;
@@ -177,7 +177,7 @@ namespace Instapaper
             return state;
         }
 
-        class State
+        public class State
         {
             public State()
             {
@@ -201,7 +201,7 @@ namespace Instapaper
 
             internal State Push(Span inline, HtmlNode htmlNode)
             {
-                //CloseSpan();
+                CloseSpan();
                 myspan = inline;
 
                 foreach(var node in htmlNode.ChildNodes)
@@ -209,7 +209,7 @@ namespace Instapaper
                     Parse(this, node);
                 }
 
-                //CloseSpan();
+                CloseSpan();
                 return this;
             }
 
@@ -243,11 +243,7 @@ namespace Instapaper
                 if (p != null)
                 {
                     p.Margin = new Thickness(0, 10 * settings.SizeModifier, 0, 10 * settings.SizeModifier);
-                    CloseSpan();
-                    if(mygraph != null && mygraph.Inlines.Count > 0)
-                    {
-                        paragraphs.Add(mygraph);
-                    }
+                    CloseParagraph();
                     mygraph = p;
                     return p;
                 }
@@ -267,7 +263,53 @@ namespace Instapaper
 
             internal void CloseParagraph()
             {
-                Push(new Paragraph());
+                CloseSpan();
+                if (mygraph != null && mygraph.Inlines.Count > 0)
+                {
+                    var inlcount = mygraph.Inlines.Count;
+                    mygraph.Inlines.Select((i, ind) =>
+                    {
+                        if(i is Bold || i is Italic || i is Hyperlink)
+                        {
+                            if(ind != 0)
+                            {
+                                AddSpaceStart(i);
+                            }
+
+                            if(ind != inlcount - 1)
+                            {
+                                AddSpaceEnd(i);
+                            }
+                        }
+                        return -1;
+                    }).ToList();
+
+                    paragraphs.Add(mygraph);
+                    mygraph = null;
+                }
+            }
+
+            internal void AddSpaceStart(Inline i)
+            {
+                if(i is Span span)
+                {
+                    AddSpaceStart(span.Inlines.First());
+                } else if (i is Run run)
+                {
+                    run.Text = " " + run.Text;
+                }
+            }
+
+            internal void AddSpaceEnd(Inline i)
+            {
+                if (i is Span span)
+                {
+                    AddSpaceEnd(span.Inlines.Last());
+                }
+                else if (i is Run run)
+                {
+                    run.Text = run.Text + " ";
+                }
             }
 
             internal State Push(Paragraph p)
@@ -282,21 +324,21 @@ namespace Instapaper
             {
                 if (myspan != null && myspan.Inlines.Count > 0)
                 {
-                    if (GetParagraph().Inlines.Count > 0 && (myspan is Bold || myspan is Italic || myspan is Hyperlink))
-                    {
-                        mygraph.Inlines.Add(new Run
-                        {
-                            Text = " "
-                        });
-                    }
-                    mygraph.Inlines.Add(myspan);
-                    if (myspan is Bold || myspan is Italic || myspan is Hyperlink)
-                    {
-                        mygraph.Inlines.Add(new Run
-                        {
-                            Text = " "
-                        });
-                    }
+                    //if (GetParagraph().Inlines.Count > 0 && (myspan is Bold || myspan is Italic || myspan is Hyperlink))
+                    //{
+                    //    mygraph.Inlines.Add(new Run
+                    //    {
+                    //        Text = " "
+                    //    });
+                    //}
+                    GetParagraph().Inlines.Add(myspan);
+                    //if (myspan is Bold || myspan is Italic || myspan is Hyperlink)
+                    //{
+                    //    mygraph.Inlines.Add(new Run
+                    //    {
+                    //        Text = " "
+                    //    });
+                    //}
                     myspan = null;
                 }
             }
@@ -444,39 +486,40 @@ namespace Instapaper
         {
             if(paragraphs == null)
             {
-                return "";
+                return "[]";
             }
 
-            var res = "";
-
-            foreach (var paragraph in paragraphs)
-            {
-                res += "\nParagraph:\n"+ Parse(paragraph.Inlines, 1);
-            }
-
-            return res;
+            return "\r\n" + paragraphs.Select(p => "p {\r\n" + Parse(p.Inlines, 1) + "\r\n}").Combine((i, j) => $"{i},\r\n{j}");
         }
 
         private static string Parse(InlineCollection inlines, int v)
         {
-            return inlines.Select(i => Parse(i, v)).CombineWithNewLine();
+            return inlines.Select(i => Parse(i, v)).Combine((i,j) => $"{i},\r\n{j}");
         }
 
 
         private static string Parse(Inline inline, int indent)
         {
+            var res = "";
             if(inline is Span span)
             {
-                return "\t".Repeat(indent) + span.GetType().Name + ":\n" + Parse(span.Inlines, indent+1) + "\n";
+                res += "    ".Repeat(indent) + inline.GetType().Name + " {\r\n";
+                res += Parse(span.Inlines, indent + 1) + "\r\n";
+                res += "    ".Repeat(indent) + "}";
             } 
             else if (inline is Run run)
             {
-                return "\t".Repeat(indent) + inline.GetType().Name + ": " + run.Text;
+                res += "    ".Repeat(indent) + inline.GetType().Name + " {\r\n";
+                res += "    ".Repeat(indent+1) + $"'{run.Text}'\r\n";
+                res += "    ".Repeat(indent) + "}";
+
             }
             else
             {
-                return "\t".Repeat(indent) + inline.GetType().Name + ":";
+                res += "    ".Repeat(indent) + inline.GetType().Name + " {}";
             }
+
+            return res;
 
             
         }

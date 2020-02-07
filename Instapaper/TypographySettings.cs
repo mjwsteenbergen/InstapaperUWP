@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Instapaper
 {
-    class TypographySettings
+    public class TypographySettings
     {
         public static TypographySettings GetDefaultSettings()
         {
