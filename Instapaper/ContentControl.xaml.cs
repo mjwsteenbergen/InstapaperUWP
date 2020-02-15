@@ -38,12 +38,11 @@ namespace Instapaper
         public Bookmark SelectedBookmark { get; set; }
         internal Settings Settings { get; set; }
 
+        private Article ArticleControl;
+        private StackPanel BarButtonStackpanel;
+
         public async Task Initiate()
         {
-            Window.Current.SizeChanged += (s, ex) =>
-            {
-                this.ItemsPane.IsPaneOpen = !ApplicationView.GetForCurrentView().IsFullScreenMode;
-            };
 
             await SetBookmarks();
             this.ArticleControl.TextHighlighted += async (s, text) =>
@@ -89,7 +88,7 @@ namespace Instapaper
                 html = html.Replace(i.text, $"<mark>{i.text}</mark>");
             });
 
-            ArticleControl.SetText(html);
+            ArticleControl.SetDetailedView(html, bm);
         }
 
         private void FullscreenToggle(object sender, RoutedEventArgs e)
@@ -119,7 +118,7 @@ namespace Instapaper
         private void MakeGridHaveAllSpace(object sender, SizeChangedEventArgs e)
         {
             ListViewItem listViewItem = (sender as ListViewItem);
-            ArticleWrapGrid.Width = listViewItem.ActualWidth;
+            //ArticleWrapGrid.Width = listViewItem.ActualWidth;
 
         }
 
@@ -128,7 +127,7 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Archive(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
-            ArticleControl.SetText(null);
+            ArticleControl.ClearText();
             SelectedBookmark = null;
         }
 
@@ -137,7 +136,7 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Star(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
-            ArticleControl.SetText(null);
+            ArticleControl.ClearText();
             SelectedBookmark = null;
         }
 
@@ -146,8 +145,22 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Delete(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
-            ArticleControl.SetText(null);
+            ArticleControl.ClearText();
             SelectedBookmark = null;
+        }
+
+        private void Article_Loaded(object sender, RoutedEventArgs e)
+        {
+            ArticleControl = sender as Article;
+        }
+
+        public static string ItemSubheaderUrl(string url) => new Uri(url).Host;
+        public static string ItemSubheaderProgress(float url) => url.ToString("P");
+        public static string ItemSubheaderTime(int time) => new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc).AddSeconds(time).ToLocalTime().ToString();
+
+        private void BarButtonStackpanel_Loaded(object sender, RoutedEventArgs e)
+        {
+            BarButtonStackpanel = sender as StackPanel;
         }
     }
 }

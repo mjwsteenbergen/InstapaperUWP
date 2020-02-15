@@ -23,7 +23,6 @@
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <!--<TextBlock Text="PANE CONTENT" x:Name="PaneHeader" Margin="60,12,0,0" Style="{StaticResource BaseTextBlockStyle}"/>-->
                     <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,30,0,24">
                         <AppBarButton Width="40" Height="40" Style="{StaticResource AppBarButtonRevealStyle}" Icon="GlobalNavigationButton"/>
                         <TextBlock Text="Settings" Margin="24,0,0,0" VerticalAlignment="Center"/>

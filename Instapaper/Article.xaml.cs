@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ApiLibs.Instapaper;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -18,24 +19,35 @@ using Windows.UI.Xaml.Navigation;
 
 namespace Instapaper
 {
-    public sealed partial class Article : UserControl
+    public sealed partial class Article : UserControl, INotifyPropertyChanged
     {
         public delegate void HighlightHandler(object sender, string highlightedText);
 
         // Declare the event.
         public event HighlightHandler TextHighlighted;
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(String propertyName = "")
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public Bookmark selectedBookmark { get; set; }
+
         public Article()
         {
             this.InitializeComponent();
         }
 
-        public void SetText(string html)
+        public void SetDetailedView(string html, Bookmark bm)
         {
-            if(html == null)
-            {
-                RichText.Blocks.Clear();
-            }
+            selectedBookmark = bm;
+            NotifyPropertyChanged(nameof(selectedBookmark));
+
 
             var res = HtmlRichTextBlockv3.SetHtml(RichText, html, null, (e) =>
             {
@@ -51,6 +63,15 @@ namespace Instapaper
             TextHighlighted.Invoke(this, RichText.SelectedText);
         }
 
-
+        internal void ClearText()
+        {
+            RichText.Blocks.Clear();
+            selectedBookmark = new Bookmark
+            {
+                title = "",
+                url = ""
+            };
+            NotifyPropertyChanged(nameof(selectedBookmark));
+        }
     }
 }
