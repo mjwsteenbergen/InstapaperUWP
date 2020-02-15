@@ -89,8 +89,6 @@ namespace Instapaper
                 html = html.Replace(i.text, $"<mark>{i.text}</mark>");
             });
 
-            RichTextListview.ScrollIntoView(RichTextListview.Items.FirstOrDefault());
-
             ArticleControl.SetText(html);
         }
 

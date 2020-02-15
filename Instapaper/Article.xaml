@@ -14,7 +14,6 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-
         </Grid>
         <RichTextBlock Grid.Column="1" HorizontalAlignment="Center" x:Name="RichText"  IsTextSelectionEnabled="True">
             <RichTextBlock.SelectionFlyout>

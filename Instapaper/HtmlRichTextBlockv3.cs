@@ -23,10 +23,12 @@ namespace Instapaper
     public class HtmlRichTextBlockv3
     {
         public static TypographySettings settings;
+        private static Action<string> OnUrl = (e) => { };
 
-        public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null)
+        public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null, Action<string> onUrl = null)
         {
             settings = tsettings ?? TypographySettings.GetDefaultSettings();
+            OnUrl = onUrl ?? OnUrl;
             richText.Blocks.Clear();
 
             try
@@ -138,10 +140,9 @@ namespace Instapaper
                 case "em":
                     return state.Push(new Italic(), htmlNode);
                 case "a" when htmlNode.Attributes.FirstOrDefault(i => i.Name == "href") != null:
-                    return state.Push(new Hyperlink
-                    {
-                        NavigateUri = new Uri(htmlNode.Attributes.FirstOrDefault(i => i.Name == "href").Value)
-                    }, htmlNode);
+                    Hyperlink hl = new Hyperlink();
+                    hl.Click += (s, e) => { OnUrl(htmlNode.Attributes.FirstOrDefault(i => i.Name == "href").Value); };
+                    return state.Push(hl, htmlNode);
                 case "a":
                     return state.Push(new Span(), htmlNode);
                 case "mark":

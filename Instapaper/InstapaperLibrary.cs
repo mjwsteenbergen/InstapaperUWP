@@ -13,13 +13,24 @@ namespace Instapaper
 {
     public class InstapaperLibrary
     {
-        public InstapaperLibrary(InstapaperService instapaper)
+        private static InstapaperLibrary _library;
+
+        public static InstapaperLibrary Library { get
+            {
+                _library = _library ?? new InstapaperLibrary();
+                return _library;
+            }
+        }
+
+        private InstapaperLibrary() { }
+
+        public InstapaperService Instapaper { get; private set; }
+        public LocalMemory mem = new LocalMemory();
+
+        public void SetService(InstapaperService instapaper)
         {
             Instapaper = instapaper;
         }
-
-        public InstapaperService Instapaper { get; }
-        public LocalMemory mem = new LocalMemory();
 
         public async Task<List<Bookmark>> StoreBookmarks(DownloadSettings settings)
         {
@@ -87,6 +98,15 @@ namespace Instapaper
 
 
             return bms;
+        }
+
+        internal Task Save(Uri source)
+        {
+            return TryToExecute(new InstapaperAction
+            {
+                Action = ActionType.Save,
+                Url = source.AbsoluteUri
+            });
         }
 
         public Task<Dictionary<string, int>> GetFolders()
@@ -219,6 +239,9 @@ namespace Instapaper
                 case ActionType.Highlight:
                     await Instapaper.AddHighlight(action.Bookmark, action.Text);
                     break;
+                case ActionType.Save:
+                    await Instapaper.AddBookmark(action.Url);
+                    break;
                 default:
                     break;
             }
@@ -229,6 +252,7 @@ namespace Instapaper
         public int Bookmark { get; set; }
         public ActionType Action { get; set; }
         public string Text { get; internal set; }
+        public string Url { get; internal set; }
     }
 
     public enum ActionType
@@ -237,6 +261,7 @@ namespace Instapaper
         Star,
         UnStar,
         Delete,
-        Highlight
+        Highlight,
+        Save
     }
 }

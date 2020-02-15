@@ -33,6 +33,7 @@ namespace Instapaper
     /// </summary>
     public sealed partial class ArticlePage : Page, INotifyPropertyChanged
     {
+        public static Page Instance { get; internal set; }
         private string _html;
         public string Html
         {
@@ -53,6 +54,7 @@ namespace Instapaper
 
         public ArticlePage()
         {
+            Instance = this;
             this.InitializeComponent();
             Bookmarks = new ObservableCollection<Bookmark>();
         }
@@ -77,7 +79,8 @@ namespace Instapaper
 
             //Set stuff
             var settigns = await Settings.LoadSettings();
-            Instapaper = new InstapaperLibrary(settigns.GenerateService());
+            Instapaper = InstapaperLibrary.Library;
+            Instapaper.SetService(settigns.GenerateService());
 
             //Set below
             ContentComponent.Instapaper = Instapaper;

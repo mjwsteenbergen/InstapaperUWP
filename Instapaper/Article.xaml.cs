@@ -37,9 +37,12 @@ namespace Instapaper
                 RichText.Blocks.Clear();
             }
 
-            var res = HtmlRichTextBlockv3.SetHtml(RichText, html);
+            var res = HtmlRichTextBlockv3.SetHtml(RichText, html, null, (e) =>
+            {
+                UrlPopupControl.Instance.ShowWithUrl(new Uri(e));
+            });
 #if DEBUG
-            Tree.Text = ParagraphTree.Parse(res);
+            //Tree.Text = ParagraphTree.Parse(RichText.Blocks.First().);
 #endif
         }
 
@@ -47,5 +50,7 @@ namespace Instapaper
         {
             TextHighlighted.Invoke(this, RichText.SelectedText);
         }
+
+
     }
 }
