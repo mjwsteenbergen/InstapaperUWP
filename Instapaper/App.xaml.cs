@@ -48,6 +48,10 @@ namespace Instapaper
 
             AppCenter.Start("f129a233-54a5-45e5-9b7f-eb912411846f", typeof(Analytics), typeof(Crashes));
 
+#if DEBUG && !DISABLE_XAML_GENERATED_BREAK_ON_UNHANDLED_EXCEPTION
+            await Crashes.SetEnabledAsync(false);
+#endif
+
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
             if (rootFrame == null)
