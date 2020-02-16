@@ -47,9 +47,13 @@ namespace Instapaper
             }
         }
 
+        internal Settings Settings { get; private set; }
         public InstapaperLibrary Instapaper { get; set; }
 
         public ObservableCollection<Bookmark> Bookmarks { get; set; }
+        public ObservableCollection<string> Folders { get; set; }
+
+        public string CurrentFolderName { get; set; }
 
 
         public ArticlePage()
@@ -57,6 +61,7 @@ namespace Instapaper
             Instance = this;
             this.InitializeComponent();
             Bookmarks = new ObservableCollection<Bookmark>();
+            Folders = new ObservableCollection<string>();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -78,14 +83,12 @@ namespace Instapaper
             ApplicationView.PreferredLaunchWindowingMode = ApplicationViewWindowingMode.Maximized;
 
             //Set stuff
-            var settigns = await Settings.LoadSettings();
+            Settings = await Settings.LoadSettings();
             Instapaper = InstapaperLibrary.Library;
-            Instapaper.SetService(settigns.GenerateService());
+            Instapaper.SetService(Settings.GenerateService());
 
-            //Set below
-            ContentComponent.Instapaper = Instapaper;
-            ContentComponent.Settings = settigns;
-            await ContentComponent.Initiate();
+            //Insert folders
+            (await Instapaper.GetFolders()).Foreach(i => Folders.Add(i.Key));
 
             //Automatically go to fullscreen mode
             var scaleFactor = DisplayInformation.GetForCurrentView();
@@ -102,11 +105,23 @@ namespace Instapaper
 
             };
 
-
             Window.Current.SizeChanged += (s, ex) =>
             {
-                this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
+                //this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
             };
+
+            //Set below
+            ContentComponent.Instapaper = Instapaper;
+            ContentComponent.Settings = Settings;
+            await ContentComponent.Initiate();
+
+        }
+
+        private async void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var newFolder = e.AddedItems.First() as string;
+            Settings.FolderId = (await Instapaper.GetFolders()).First(i => i.Key == newFolder).Value.ToString();
+            await ContentComponent.UpdateBookMarksInView();
         }
     }
 }

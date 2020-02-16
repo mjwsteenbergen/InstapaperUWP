@@ -13,30 +13,16 @@
     Loaded="Load">
 
     <Grid>
-        <SplitView x:Name="main" PaneBackground="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"
-           IsPaneOpen="False" DisplayMode="CompactOverlay" CompactPaneLength="40">
-            <SplitView.Pane>
-                <Grid Background="{ThemeResource SystemControlBackgroundChromeMediumBrush}">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,30,0,24">
-                        <AppBarButton Width="40" Height="40" Style="{StaticResource AppBarButtonRevealStyle}" Icon="GlobalNavigationButton"/>
-                        <TextBlock Text="Settings" Margin="24,0,0,0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                    <Grid Grid.Row="2"/>
-                    <StackPanel Orientation="Horizontal" Grid.Row="3" Margin="14,24,0,24" >
-                        <SymbolIcon Symbol="Setting" />
-                        <TextBlock Text="Settings" Margin="24,0,0,0" VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Grid>
-            </SplitView.Pane>
-
+        <muxc:NavigationView IsSettingsVisible="False" PaneDisplayMode="LeftMinimal" IsPaneOpen="False" IsPaneVisible="True" IsBackButtonVisible="Collapsed">
+            <muxc:NavigationView.PaneCustomContent>
+                <StackPanel>
+                    <TextBlock Text="Folders" Style="{ThemeResource TitleTextBlockStyle}" Margin="14,0,0,15"/>
+                    <ListView ItemsSource="{x:Bind Folders, Mode=OneWay}" SelectionChanged="ListView_SelectionChanged"/>
+                </StackPanel>
+            </muxc:NavigationView.PaneCustomContent>
             <local:ContentControl x:Name="ContentComponent"/>
-        </SplitView>
+        </muxc:NavigationView>
+
         <local:UrlPopupControl/>
     </Grid>
 </Page>

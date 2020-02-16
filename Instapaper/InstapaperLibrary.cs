@@ -41,24 +41,37 @@ namespace Instapaper
 
 
                 List<Folder> folders = await Instapaper.GetFolders();
-                await mem.Write("folders.json", new Dictionary<string, int>(folders.Select(i => new KeyValuePair<string, int>(i.title, i.folder_id))));
 
-                foreach (var folder in new List<string> { "unread", "starred", "archive" })
+                List<KeyValuePair<string, string>> allFolders = new List<KeyValuePair<string, string>>
                 {
-                    int downloadLimit = 20;
-                    if (folder == "unread")
+                    new KeyValuePair<string, string>("My Articles", "unread"),
+                    new KeyValuePair<string, string>("Starred", "starred"),
+                    new KeyValuePair<string, string>("Archived", "archive"),
+                };
+
+                allFolders.AddRange(folders.Select(i => new KeyValuePair<string, string>(i.title, i.folder_id.ToString())));
+
+                var folderDict = new Dictionary<string, string>(allFolders);
+                await mem.Write("folders.json", folderDict);
+
+                foreach (var folder in allFolders)
+                {
+                    int downloadLimit = settings.DownloadFolder;
+                    if (folder.Value == "unread")
                     {
                         downloadLimit = settings.DownloadMain;
-                    } else if (folder == "starred")
+                    }
+                    else if (folder.Value == "starred")
                     {
                         downloadLimit = settings.DownloadLiked;
-                    } else if (folder == "archive")
+                    }
+                    else if (folder.Value == "archive")
                     {
                         downloadLimit = settings.DownloadArchived;
                     }
 
-                    var bookmarks = await Instapaper.GetBookmarks(folder, downloadLimit);
-                    await mem.Write($"bookmarks-{folder}.json", bookmarks);
+                    var bookmarks = await Instapaper.GetBookmarks(folder.Value, downloadLimit);
+                    await mem.Write($"bookmarks-{folder.Value}.json", bookmarks);
 
                     foreach (var i in bookmarks)
                     {
@@ -70,24 +83,6 @@ namespace Instapaper
                         await mem.ReadOrCalculate($"highlights-{i.bookmark_id}", () => Instapaper.GetHighlights(i));
                     }
                 }
-
-                foreach (var folder in folders)
-                {
-                    var bookmarks = await Instapaper.GetBookmarks(settings.DownloadFolder, folder);
-                    await mem.Write($"bookmarks-{folder.folder_id}.json", bookmarks);
-
-                    foreach (var i in bookmarks)
-                    {
-                        try
-                        {
-                            await mem.ReadOrCalculate($"html-{i.bookmark_id}", () => Instapaper.GetHTML(i));
-                        }
-                        catch { }
-                        await mem.ReadOrCalculate($"highlights-{i.bookmark_id}", () => Instapaper.GetHighlights(i));
-                    }
-                }
-
-                
             }
             catch(NoInternetException) {}
 
@@ -109,9 +104,9 @@ namespace Instapaper
             });
         }
 
-        public Task<Dictionary<string, int>> GetFolders()
+        public Task<Dictionary<string, string>> GetFolders()
         {
-            return mem.Read<Dictionary<string, int>>("folders.json");
+            return mem.Read<Dictionary<string, string>>("folders.json");
         }
 
         public async Task<List<Bookmark>> GetBookmarks(string folder)

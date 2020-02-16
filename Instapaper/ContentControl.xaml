@@ -14,7 +14,7 @@
                                     NoSelectionContent="Lets start reading something, shall we?"
                                     CompactModeThresholdWidth="1500"
                                 BorderBrush="{ThemeResource SystemAltLowColor}"
-                                MasterPaneBackground="{ThemeResource SystemChromeLowColor}"
+                                Background="{ThemeResource SystemChromeLowColor}"
                                  MasterPaneWidth="400"
                                 x:Name="mdView"
                                 SelectionChanged="ListView_SelectionChanged">
@@ -32,7 +32,7 @@
         </controls:MasterDetailsView.ItemTemplate>
         <controls:MasterDetailsView.MasterHeader>
             <StackPanel>
-                <TextBlock Text="My Articles" Style="{ThemeResource HeaderTextBlockStyle}" Margin="20,4" FontWeight="Normal"/>
+                <TextBlock Text="My Articles" Style="{ThemeResource HeaderTextBlockStyle}" Margin="40,10,0,0" FontWeight="Normal"/>
             </StackPanel>
         </controls:MasterDetailsView.MasterHeader>
         <controls:MasterDetailsView.DetailsHeaderTemplate>
@@ -56,7 +56,9 @@
         </controls:MasterDetailsView.DetailsHeaderTemplate>
         <controls:MasterDetailsView.DetailsTemplate>
             <DataTemplate>
-                <local:Article Loaded="Article_Loaded"/>
+                <Grid Background="{ThemeResource SystemAltHighColor}">
+                    <local:Article Loaded="Article_Loaded"/>
+                </Grid>
             </DataTemplate>
         </controls:MasterDetailsView.DetailsTemplate>
         <controls:MasterDetailsView.NoSelectionContentTemplate>
