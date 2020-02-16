@@ -69,7 +69,7 @@ namespace Instapaper
             selectedBookmark = new Bookmark
             {
                 title = "",
-                url = ""
+                url = "https://nntn.nl/"
             };
             NotifyPropertyChanged(nameof(selectedBookmark));
         }
