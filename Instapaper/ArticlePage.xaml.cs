@@ -33,7 +33,7 @@ namespace Instapaper
     /// </summary>
     public sealed partial class ArticlePage : Page, INotifyPropertyChanged
     {
-        public static Page Instance { get; internal set; }
+        public static ArticlePage Instance { get; internal set; }
         private string _html;
         public string Html
         {
@@ -62,6 +62,10 @@ namespace Instapaper
             this.InitializeComponent();
             Bookmarks = new ObservableCollection<Bookmark>();
             Folders = new ObservableCollection<string>();
+
+            ArticleNavigationView.PaneOpening += (s,e) => { ArticleNavigationView.IsPaneVisible = true; };
+            ArticleNavigationView.PaneClosing += (s,e) => { ArticleNavigationView.IsPaneVisible = false; };
+
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -113,7 +117,7 @@ namespace Instapaper
             //Set below
             ContentComponent.Instapaper = Instapaper;
             ContentComponent.Settings = Settings;
-            await ContentComponent.Initiate();
+            ContentComponent.Initiate();
 
         }
 
@@ -122,6 +126,19 @@ namespace Instapaper
             var newFolder = e.AddedItems.First() as string;
             Settings.FolderId = (await Instapaper.GetFolders()).First(i => i.Key == newFolder).Value.ToString();
             await ContentComponent.UpdateBookMarksInView();
+        }
+
+        public void ShowSidebar()
+        {
+            ArticleNavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftCompact;
+            ArticleNavigationView.IsPaneToggleButtonVisible = true;
+            ArticleNavigationView.IsPaneOpen = false;
+        }
+
+        public void HideSidebar()
+        {
+            ArticleNavigationView.PaneDisplayMode = NavigationViewPaneDisplayMode.LeftMinimal;
+            ArticleNavigationView.IsPaneToggleButtonVisible = false;
         }
     }
 }

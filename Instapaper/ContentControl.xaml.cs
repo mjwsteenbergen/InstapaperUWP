@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Web;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Display;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -41,17 +42,40 @@ namespace Instapaper
         private Article ArticleControl;
         private StackPanel BarButtonStackpanel;
 
-        public async Task Initiate()
+        public void Initiate()
         {
 
-            await SetBookmarks();
+            SetBookmarks();
             this.ArticleControl.TextHighlighted += async (s, text) =>
             {
                 await Instapaper.Highlight(SelectedBookmark, text);
             };
+
+            SetSidebarVisibility(Window.Current.Bounds.Width);
+
+            Window.Current.SizeChanged += (s, ex) =>
+            {
+                SetSidebarVisibility(ex.Size.Width);
+
+                //this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
+            };
         }
 
-        private async Task SetBookmarks()
+        public void SetSidebarVisibility(double width)
+        {
+            var scaleFactor2 = DisplayInformation.GetForCurrentView();
+            this.mdView.CompactModeThresholdWidth = scaleFactor2.ScreenWidthInRawPixels / 2 + 10;
+
+            if (width < scaleFactor2.ScreenWidthInRawPixels / 2 + 10 && SelectedBookmark != null)
+            {
+                ArticlePage.Instance.HideSidebar();
+            } else
+            {
+                ArticlePage.Instance.ShowSidebar();
+            }
+        }
+
+        private async void SetBookmarks()
         {
             await UpdateBookMarksInView();
             await Instapaper.StoreBookmarks(Settings.DownloadSettings);
@@ -89,6 +113,7 @@ namespace Instapaper
             });
 
             ArticleControl.SetDetailedView(html, bm);
+            SetSidebarVisibility(Window.Current.Bounds.Width);
         }
 
         private void FullscreenToggle(object sender, RoutedEventArgs e)
@@ -127,8 +152,7 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Archive(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
-            ArticleControl.ClearText();
-            SelectedBookmark = null;
+            UnsetArticleView();
         }
 
         private async void Star(object sender, RoutedEventArgs e)
@@ -136,8 +160,7 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Star(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
-            ArticleControl.ClearText();
-            SelectedBookmark = null;
+            UnsetArticleView();
         }
 
         private async void Delete(object sender, RoutedEventArgs e)
@@ -145,8 +168,14 @@ namespace Instapaper
             if(SelectedBookmark == null) { return; }
             await Instapaper.Delete(SelectedBookmark);
             Bookmarks.Remove(SelectedBookmark);
+            UnsetArticleView();
+        }
+
+        public void UnsetArticleView()
+        {
             ArticleControl.ClearText();
             SelectedBookmark = null;
+            SetSidebarVisibility(Window.Current.Bounds.Width);
         }
 
         private void Article_Loaded(object sender, RoutedEventArgs e)

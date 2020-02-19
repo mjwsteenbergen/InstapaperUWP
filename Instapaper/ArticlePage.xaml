@@ -13,7 +13,7 @@
     Loaded="Load">
 
     <Grid>
-        <muxc:NavigationView IsSettingsVisible="False" PaneDisplayMode="LeftMinimal" IsPaneOpen="False" IsPaneVisible="True" IsBackButtonVisible="Collapsed">
+        <muxc:NavigationView x:Name="ArticleNavigationView" IsSettingsVisible="False" PaneDisplayMode="LeftCompact" IsPaneOpen="False" IsPaneVisible="False" IsBackButtonVisible="Collapsed">
             <muxc:NavigationView.PaneCustomContent>
                 <StackPanel>
                     <TextBlock Text="Folders" Style="{ThemeResource TitleTextBlockStyle}" Margin="14,0,0,15"/>

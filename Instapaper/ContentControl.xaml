@@ -12,10 +12,9 @@
     <controls:MasterDetailsView BackButtonBehavior="Automatic" 
                                     ItemsSource="{x:Bind Bookmarks}"
                                     NoSelectionContent="Lets start reading something, shall we?"
-                                    CompactModeThresholdWidth="1500"
                                 BorderBrush="{ThemeResource SystemAltLowColor}"
                                 Background="{ThemeResource SystemChromeLowColor}"
-                                 MasterPaneWidth="400"
+                                MasterPaneWidth="400"
                                 x:Name="mdView"
                                 SelectionChanged="ListView_SelectionChanged">
         <controls:MasterDetailsView.ItemTemplate>
@@ -32,7 +31,7 @@
         </controls:MasterDetailsView.ItemTemplate>
         <controls:MasterDetailsView.MasterHeader>
             <StackPanel>
-                <TextBlock Text="My Articles" Style="{ThemeResource HeaderTextBlockStyle}" Margin="40,10,0,0" FontWeight="Normal"/>
+                <TextBlock Text="My Articles" Style="{ThemeResource HeaderTextBlockStyle}" Margin="10,10,0,0" FontWeight="Normal"/>
             </StackPanel>
         </controls:MasterDetailsView.MasterHeader>
         <controls:MasterDetailsView.DetailsHeaderTemplate>
