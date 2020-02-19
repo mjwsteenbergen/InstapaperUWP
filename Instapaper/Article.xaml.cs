@@ -81,7 +81,7 @@ namespace Instapaper
 
         private void Highlight_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //TextHighlighted.Invoke(this, RichText.SelectedText);
+            TextHighlighted.Invoke(this, RichText.SelectedText);
 
             string textUpToStart = this.RichText.TextUpTo(this.RichText.SelectionStart);
             string textUpToEnd = this.RichText.TextUpTo(this.RichText.SelectionEnd);
