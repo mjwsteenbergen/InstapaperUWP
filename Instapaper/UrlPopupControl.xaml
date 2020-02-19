@@ -10,8 +10,12 @@
     <Grid x:Name="PopupContainer" Visibility="Collapsed" Canvas.ZIndex="1000" HorizontalAlignment="Stretch" Background="{ThemeResource SystemBaseMediumColor}" Tapped="CloseHandler">
         <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Padding="30" Tapped="StopDissmiss">
             <StackPanel Orientation="Horizontal">
-
-                <WebView x:Name="wv" Width="600" Height="1000"/>
+                <StackPanel>
+                    <Grid Background="{ThemeResource SystemBaseHighColor}">
+                        <TextBlock x:Name="wvUrl" Foreground="{ThemeResource SystemAltMediumColor}" Width="600" Padding="7" Text="hasdhaksjasdkajsdkjasdjkadksjadadjkaskadsdkasjkdkas"/>
+                    </Grid>
+                    <WebView x:Name="wv" Width="600" Height="1000"/>
+                </StackPanel>
                 <StackPanel Margin="50,0" Width="300">
                     
                     <Button Margin="10" Style="{ThemeResource TextBlockButtonStyle}" Tapped="OpenInBrowser">

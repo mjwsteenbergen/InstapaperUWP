@@ -37,6 +37,7 @@ namespace Instapaper
         {
             Show();
             wv.Navigate(uri);
+            wvUrl.Text = uri.AbsoluteUri;
         }
 
         private void CloseHandler(object sender, TappedRoutedEventArgs e)
@@ -46,6 +47,7 @@ namespace Instapaper
 
         private void Close()
         {
+            wv.Navigate(new Uri("about:blank"));
             PopupContainer.Visibility = Visibility.Collapsed;
         }
 
