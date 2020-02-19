@@ -69,17 +69,24 @@ namespace Instapaper
             {
                 case "iframe":
                     var wv = new WebView(WebViewExecutionMode.SeparateThread);
-                    wv.Width = 1000;
-                    wv.Height = 562.5;
+                    wv.SizeChanged += (s, e) =>
+                    {
+                        wv.Width = 1000;
+                        wv.Height = wv.ActualWidth / 1000 * 562.5;
+                    };
+
                     wv.Navigate(new Uri(htmlNode.Attributes.FirstOrDefault(i => i.Name == "src").Value));
                     wv.NavigationCompleted += async (s, e) =>
                     {
-                        var heightString = await s.InvokeScriptAsync("eval", new[] { "document.body.scrollHeight.toString()" });
-                        int height;
-                        if (int.TryParse(heightString, out height))
+                        if(e.IsSuccess)
                         {
-                            s.Height = height;
-                        };
+                            var heightString = await s.InvokeScriptAsync("eval", new[] { "document.body.scrollHeight.toString()" });
+                            int height;
+                            if (int.TryParse(heightString, out height))
+                            {
+                                s.Height = height;
+                            };
+                        }
                     };
 
                     return state.PushInSingleParagraph(wv);
@@ -141,6 +148,7 @@ namespace Instapaper
                     return state.PushSurroundedWithSpaces(new Italic(), htmlNode);
                 case "a" when htmlNode.Attributes.FirstOrDefault(i => i.Name == "href") != null:
                     Hyperlink hl = new Hyperlink();
+                    hl.TextDecorations = TextDecorations.None;
                     hl.Click += (s, e) => { OnUrl(htmlNode.Attributes.FirstOrDefault(i => i.Name == "href").Value); };
                     return state.PushSurroundedWithSpaces(hl, htmlNode);
                 case "a":
@@ -398,7 +406,7 @@ namespace Instapaper
 
             bitmapImage.ImageOpened += (sender, e) =>
             {
-                img.Width = Math.Min(1000, bitmapImage.PixelWidth);
+                img.Width = Math.Min(img.ActualWidth, bitmapImage.PixelWidth);
                 img.Height = (img.Width * bitmapImage.PixelHeight) / bitmapImage.PixelWidth;
             };
 

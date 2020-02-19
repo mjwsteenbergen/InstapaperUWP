@@ -107,12 +107,8 @@ namespace Instapaper
             SelectedBookmark = bm;
             var html = await Instapaper.GetHtml(bm);
             var highlights = await Instapaper.GetHighlights(bm);
-            highlights.OrderBy(i => i.position).Foreach(i =>
-            {
-                html = html.Replace(i.text, $"<mark>{i.text}</mark>");
-            });
 
-            ArticleControl.SetDetailedView(html, bm);
+            ArticleControl.SetDetailedView(html, bm, highlights);
             SetSidebarVisibility(Window.Current.Bounds.Width);
         }
 

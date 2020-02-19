@@ -22,9 +22,9 @@
 
                 <HyperlinkButton Content="{x:Bind selectedBookmark.url, Mode=OneWay}" NavigateUri="{x:Bind selectedBookmark.url, Mode=OneWay}" Margin="0,0,0,40"/>
 
-                <RichTextBlock  x:Name="RichText"  IsTextSelectionEnabled="True" Margin="0,0,0,100">
+                <RichTextBlock x:Name="RichText"  IsTextSelectionEnabled="True" Margin="0,0,0,100">
                     <RichTextBlock.SelectionFlyout>
-                        <muxc:CommandBarFlyout Placement="Top">
+                        <muxc:CommandBarFlyout Placement="Top" AreOpenCloseAnimationsEnabled="True">
                             <AppBarButton Label="Highlight" Icon="Highlight" ToolTipService.ToolTip="Highlight" Tapped="Highlight_Tapped" />
                         </muxc:CommandBarFlyout>
                     </RichTextBlock.SelectionFlyout>

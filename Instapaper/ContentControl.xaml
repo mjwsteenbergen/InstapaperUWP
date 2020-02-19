@@ -12,7 +12,7 @@
     <controls:MasterDetailsView BackButtonBehavior="Automatic" 
                                     ItemsSource="{x:Bind Bookmarks}"
                                     NoSelectionContent="Lets start reading something, shall we?"
-                                BorderBrush="{ThemeResource SystemAltLowColor}"
+                                BorderBrush="{ThemeResource SystemChromeLowColor}"
                                 Background="{ThemeResource SystemChromeLowColor}"
                                 MasterPaneWidth="400"
                                 x:Name="mdView"
