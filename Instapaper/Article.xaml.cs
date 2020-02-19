@@ -59,17 +59,7 @@ namespace Instapaper
                 UrlPopupControl.Instance.ShowWithUrl(new Uri(e));
             });
 
-            AllText = "";
-
-            RichText.Blocks.Foreach(i =>
-            {
-                RichText.Select(i.ContentStart, i.ContentEnd);
-                AllText += RichText.SelectedText;
-            });
-
             AllText = RichText.TextUpTo(RichText.ContentEnd);
-
-            var text2 = RichText.TextUpTo(RichText.ContentEnd);
 
             //RichText.SelectAll();
             //AllText = RichText.SelectedText.Where(i => char.IsWhiteSpace(i) || char.IsLetterOrDigit(i)).Select(i => i.ToString()).Combine((i,j) => i + j);

@@ -91,9 +91,6 @@ namespace Instapaper
             Instapaper = InstapaperLibrary.Library;
             Instapaper.SetService(Settings.GenerateService());
 
-            //Insert folders
-            (await Instapaper.GetFolders()).Foreach(i => Folders.Add(i.Key));
-
             //Automatically go to fullscreen mode
             var scaleFactor = DisplayInformation.GetForCurrentView();
             scaleFactor.OrientationChanged += (s, ex) =>
@@ -119,6 +116,8 @@ namespace Instapaper
             ContentComponent.Settings = Settings;
             ContentComponent.Initiate();
 
+            //Insert folders
+            (await Instapaper.GetFolders()).Foreach(i => Folders.Add(i.Key));
         }
 
         private async void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e)

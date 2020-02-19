@@ -95,6 +95,15 @@ namespace Instapaper
             return bms;
         }
 
+        internal async Task MoveBookmark(Bookmark bookmark, string v)
+        {
+            await TryToExecute(new InstapaperAction
+            {
+                Bookmark = bookmark.bookmark_id,
+                Folder = int.Parse(v)
+            });
+        }
+
         internal Task Save(Uri source)
         {
             return TryToExecute(new InstapaperAction
@@ -237,6 +246,9 @@ namespace Instapaper
                 case ActionType.Save:
                     await Instapaper.AddBookmark(action.Url);
                     break;
+                case ActionType.Move:
+                    await Instapaper.MoveBookmark(action.Bookmark, action.Folder);
+                    break;
                 default:
                     break;
             }
@@ -248,6 +260,7 @@ namespace Instapaper
         public ActionType Action { get; set; }
         public string Text { get; internal set; }
         public string Url { get; internal set; }
+        public int Folder { get; internal set; }
     }
 
     public enum ActionType
@@ -257,6 +270,7 @@ namespace Instapaper
         UnStar,
         Delete,
         Highlight,
-        Save
+        Save,
+        Move
     }
 }

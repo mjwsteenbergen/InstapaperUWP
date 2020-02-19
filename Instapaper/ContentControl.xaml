@@ -19,14 +19,39 @@
                                 SelectionChanged="ListView_SelectionChanged">
         <controls:MasterDetailsView.ItemTemplate>
             <DataTemplate x:DataType="apilibs:Bookmark">
-                <StackPanel Margin="5, 0">
-                    <TextBlock Text="{Binding title}" Margin="0,10,0,0" TextWrapping="NoWrap" FontSize="23" FontWeight="SemiLight"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{x:Bind local:ContentControl.ItemSubheaderUrl(url)}" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,10"/>
-                        <TextBlock Text="|" Style="{ThemeResource CaptionTextBlockStyle}" Margin="3,0,3,10"/>
-                        <TextBlock Text="{x:Bind local:ContentControl.ItemSubheaderProgress(progress)}" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,10"/>
+                <SwipeControl>
+                    <SwipeControl.RightItems>
+                        <SwipeItems Mode="Execute">
+                            <SwipeItem Text="Delete" Invoked="Delete">
+                                <SwipeItem.IconSource>
+                                    <SymbolIconSource Symbol="Delete"/>
+                                </SwipeItem.IconSource>
+                            </SwipeItem>
+                        </SwipeItems>
+                    </SwipeControl.RightItems>
+                    <SwipeControl.LeftItems>
+                        <SwipeItems Mode="Reveal">
+                            <SwipeItem Text="Archive">
+                                <SwipeItem.IconSource>
+                                    <SymbolIconSource Symbol="MoveToFolder"/>
+                                </SwipeItem.IconSource>
+                            </SwipeItem>
+                            <SwipeItem Text="Move" Invoked="MoveToFolderSwipe">
+                                <SwipeItem.IconSource>
+                                    <SymbolIconSource Symbol="MoveToFolder"/>
+                                </SwipeItem.IconSource>
+                            </SwipeItem>
+                        </SwipeItems>
+                    </SwipeControl.LeftItems>
+                    <StackPanel Padding="5, 0">
+                        <TextBlock Text="{Binding title}" Margin="0,10,0,0" TextWrapping="NoWrap" FontSize="23" FontWeight="SemiLight"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{x:Bind local:ContentControl.ItemSubheaderUrl(url)}" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,10"/>
+                            <TextBlock Text="|" Style="{ThemeResource CaptionTextBlockStyle}" Margin="3,0,3,10"/>
+                            <TextBlock Text="{x:Bind local:ContentControl.ItemSubheaderProgress(progress)}" Style="{ThemeResource CaptionTextBlockStyle}" Margin="0,0,0,10"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </SwipeControl>
             </DataTemplate>
         </controls:MasterDetailsView.ItemTemplate>
         <controls:MasterDetailsView.MasterHeader>
@@ -46,7 +71,7 @@
                     <StackPanel Loaded="BarButtonStackpanel_Loaded" Grid.Column="2" Margin="0,32,0,0" Orientation="Horizontal">
                         <AppBarButton Icon="Save" Click="Archive"/>
                         <AppBarButton Icon="Favorite" Click="Star"/>
-                        <AppBarButton Icon="MoveToFolder"/>
+                        <AppBarButton Icon="MoveToFolder" Click="MoveToFolder"/>
                         <AppBarButton Icon="Delete" Click="Delete"/>
                         <AppBarButton Icon="FullScreen" Click="FullscreenToggle"/>
                     </StackPanel>

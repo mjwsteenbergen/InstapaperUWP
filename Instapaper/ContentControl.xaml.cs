@@ -11,6 +11,7 @@ using System.Web;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Display;
+using Windows.UI.Popups;
 using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -159,12 +160,40 @@ namespace Instapaper
             UnsetArticleView();
         }
 
-        private async void Delete(object sender, RoutedEventArgs e)
+
+
+        private async void MoveToFolder(object sender, RoutedEventArgs args)
         {
-            if(SelectedBookmark == null) { return; }
-            await Instapaper.Delete(SelectedBookmark);
-            Bookmarks.Remove(SelectedBookmark);
-            UnsetArticleView();
+            if (SelectedBookmark == null) { return; }
+            await MoveToFolder(SelectedBookmark);
+        }
+
+        private async Task MoveToFolder(Bookmark bm)
+        {
+            var diag = new MoveToFolderDialog();
+            diag.bookmark = bm;
+            await diag.ShowAsync();
+            if (diag.Success)
+            {
+                Bookmarks.Remove(bm);
+                UnsetArticleView();
+            }
+        }
+
+        private async void Delete(Bookmark mark = null)
+        {
+            var mBookmark = mark ?? SelectedBookmark;
+            if(mBookmark == null) { return; }
+
+            MessageDialog messageDialog = new MessageDialog("Are you sure you want to delete this item?", "Delete bookmark?");
+            messageDialog.Commands.Add(new UICommand("Delete", new UICommandInvokedHandler(async (s) =>
+            {
+                await Instapaper.Delete(mBookmark);
+                Bookmarks.Remove(mBookmark);
+                UnsetArticleView();
+            })));
+            messageDialog.Commands.Add(new UICommand("No"));
+            await messageDialog.ShowAsync();
         }
 
         public void UnsetArticleView()
@@ -186,6 +215,22 @@ namespace Instapaper
         private void BarButtonStackpanel_Loaded(object sender, RoutedEventArgs e)
         {
             BarButtonStackpanel = sender as StackPanel;
+        }
+
+        private void Delete(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        {
+            var s = args.SwipeControl.DataContext;
+            Delete(s as Bookmark);
+        }
+
+        private void Delete(object sender, RoutedEventArgs e)
+        {
+            Delete();
+        }
+
+        private async void MoveToFolderSwipe(SwipeItem sender, SwipeItemInvokedEventArgs args)
+        {
+            await MoveToFolder(args.SwipeControl.DataContext as Bookmark);
         }
     }
 }
