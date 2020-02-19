@@ -70,27 +70,21 @@ namespace Instapaper
                         downloadLimit = settings.DownloadArchived;
                     }
 
-                    var bookmarks = await Instapaper.GetBookmarks(folder.Value, downloadLimit);
-                    await mem.Write($"bookmarks-{folder.Value}.json", bookmarks);
+                    var bookmarkInfo = await Instapaper.GetAllBookmarkInfo(folder.Value, downloadLimit);
+                    await mem.Write($"bookmarks-{folder.Value}.json", bookmarkInfo);
 
-                    foreach (var i in bookmarks)
+                    foreach (var i in bookmarkInfo.bookmarks)
                     {
                         try
                         {
                             await mem.ReadOrCalculate($"html-{i.bookmark_id}", () => Instapaper.GetHTML(i));
                         }
                         catch { }
-                        await mem.ReadOrCalculate($"highlights-{i.bookmark_id}", () => Instapaper.GetHighlights(i));
+                        await mem.Write($"highlights-{i.bookmark_id}", bookmarkInfo.highlights.Where(j => j.bookmark_id == i.bookmark_id).ToList());
                     }
                 }
             }
             catch(NoInternetException) {}
-
-            //    bms = bms ?? await Instapaper.GetBookmarks(null, 50);
-
-            //  await mem.Write("bookmarks", bms);
-
-
 
             return bms;
         }
