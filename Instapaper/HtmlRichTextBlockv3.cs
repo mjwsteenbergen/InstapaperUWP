@@ -126,23 +126,23 @@ namespace Instapaper
                 case "span":
                     return state.Push(new Span(), htmlNode);
                 case "i":
-                    return state.Push(new Italic(), htmlNode);
+                    return state.PushSurroundedWithSpaces(new Italic(), htmlNode);
                 case "b":
-                    return state.Push(new Bold 
+                    return state.PushSurroundedWithSpaces(new Bold 
                     { 
                         FontWeight = FontWeights.SemiBold
                     }, htmlNode);
                 case "strong":
-                    return state.Push(new Bold
+                    return state.PushSurroundedWithSpaces(new Bold
                     {
                         FontWeight = FontWeights.SemiBold
                     }, htmlNode);
                 case "em":
-                    return state.Push(new Italic(), htmlNode);
+                    return state.PushSurroundedWithSpaces(new Italic(), htmlNode);
                 case "a" when htmlNode.Attributes.FirstOrDefault(i => i.Name == "href") != null:
                     Hyperlink hl = new Hyperlink();
                     hl.Click += (s, e) => { OnUrl(htmlNode.Attributes.FirstOrDefault(i => i.Name == "href").Value); };
-                    return state.Push(hl, htmlNode);
+                    return state.PushSurroundedWithSpaces(hl, htmlNode);
                 case "a":
                     return state.Push(new Span(), htmlNode);
                 case "mark":
@@ -214,6 +214,41 @@ namespace Instapaper
                 return this;
             }
 
+            internal State PushSurroundedWithSpaces(Span inline, HtmlNode htmlNode)
+            {
+                CloseSpan();
+                myspan = inline;
+
+                if(paragraphs.Count > 0)
+                {
+                    AddSpace();
+                }
+
+                foreach (var node in htmlNode.ChildNodes)
+                {
+                    Parse(this, node);
+                }
+
+
+                CloseSpan();
+
+                AddSpace();
+                CloseSpan();
+                return this;
+            }
+
+            private void AddSpace()
+            {
+                Span inline = new Span();
+
+                inline.Inlines.Add(new Run
+                {
+                    Text = " "
+                });
+
+                Push(inline);
+            }
+
             internal State PushInSingleParagraph(Inline inline)
             {
                 Push(inline, new Paragraph());
@@ -267,49 +302,8 @@ namespace Instapaper
                 CloseSpan();
                 if (mygraph != null && mygraph.Inlines.Count > 0)
                 {
-                    var inlcount = mygraph.Inlines.Count;
-                    mygraph.Inlines.Select((i, ind) =>
-                    {
-                        if(i is Bold || i is Italic || i is Hyperlink)
-                        {
-                            if(ind != 0)
-                            {
-                                AddSpaceStart(i);
-                            }
-
-                            if(ind != inlcount - 1)
-                            {
-                                AddSpaceEnd(i);
-                            }
-                        }
-                        return -1;
-                    }).ToList();
-
                     paragraphs.Add(mygraph);
                     mygraph = null;
-                }
-            }
-
-            internal void AddSpaceStart(Inline i)
-            {
-                if(i is Span span)
-                {
-                    AddSpaceStart(span.Inlines.First());
-                } else if (i is Run run)
-                {
-                    run.Text = " " + run.Text;
-                }
-            }
-
-            internal void AddSpaceEnd(Inline i)
-            {
-                if (i is Span span)
-                {
-                    AddSpaceEnd(span.Inlines.Last());
-                }
-                else if (i is Run run)
-                {
-                    run.Text = run.Text + " ";
                 }
             }
 
@@ -389,7 +383,7 @@ namespace Instapaper
         {
             var href = htmlNode.Attributes.FirstOrDefault(i => i.Name == "src")?.Value;
 
-            if(href == null)
+            if(string.IsNullOrEmpty(href))
             {
                 return null;
             }
