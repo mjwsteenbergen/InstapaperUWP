@@ -120,7 +120,7 @@ namespace Instapaper
             }
             catch
             {
-                return await mem.Read<List<Bookmark>>($"bookmarks-{folder}.json");
+                return (await mem.Read<BookmarksObject>($"bookmarks-{folder}.json")).bookmarks;
             }
         }
 
@@ -252,9 +252,9 @@ namespace Instapaper
     public class InstapaperAction {
         public int Bookmark { get; set; }
         public ActionType Action { get; set; }
-        public string Text { get; internal set; }
-        public string Url { get; internal set; }
-        public int Folder { get; internal set; }
+        public string Text { get; set; }
+        public string Url { get; set; }
+        public int Folder { get; set; }
     }
 
     public enum ActionType
