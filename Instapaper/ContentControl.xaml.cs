@@ -67,7 +67,7 @@ namespace Instapaper
             var scaleFactor2 = DisplayInformation.GetForCurrentView();
             this.mdView.CompactModeThresholdWidth = Math.Max(scaleFactor2.ScreenWidthInRawPixels / 2 + 10, 1300);
 
-            if (width < Math.Max(scaleFactor2.ScreenWidthInRawPixels / 2 + 10, 1500) && SelectedBookmark != null)
+            if (width < Math.Max(scaleFactor2.ScreenWidthInRawPixels / 2 + 10, 1300) && SelectedBookmark != null)
             {
                 ArticlePage.Instance.HideSidebar();
             } else
