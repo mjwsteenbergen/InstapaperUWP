@@ -127,7 +127,7 @@ namespace Instapaper
             return TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
-                Folder = int.Parse(v)
+                Folder = v
             });
         }
 
@@ -272,16 +272,16 @@ namespace Instapaper
             switch (action.Action)
             {
                 case ActionType.Archive:
-                    Instapaper.ArchiveBookmark(action.Bookmark);
+                    await Instapaper.ArchiveBookmark(action.Bookmark);
                     break;
                 case ActionType.UnArchive:
                     await Instapaper.UnarchiveBookmark(action.Bookmark);
                     break;
                 case ActionType.Star:
-                    Instapaper.StarBookmark(action.Bookmark);
+                    await Instapaper.StarBookmark(action.Bookmark);
                     break;
                 case ActionType.UnStar:
-                    Instapaper.UnstarBookmark(action.Bookmark);
+                    await Instapaper.UnstarBookmark(action.Bookmark);
                     break;
                 case ActionType.Delete:
                     await Instapaper.DeleteBookmark(action.Bookmark);
@@ -306,7 +306,7 @@ namespace Instapaper
         public ActionType Action { get; set; }
         public string Text { get; set; }
         public string Url { get; set; }
-        public int Folder { get; set; }
+        public string Folder { get; set; }
     }
 
     public enum ActionType
