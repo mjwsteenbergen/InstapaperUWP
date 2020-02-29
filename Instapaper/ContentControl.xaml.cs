@@ -31,6 +31,17 @@ namespace Instapaper
         {
             this.InitializeComponent();
             Bookmarks = new ObservableCollection<Bookmark>();
+            this.Loaded += (s, e) =>
+            {
+                SetSidebarVisibility(Window.Current.Bounds.Width);
+
+                Window.Current.SizeChanged += (sender, ex) =>
+                {
+                    SetSidebarVisibility(ex.Size.Width);
+
+                    //this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
+                };
+            };
         }
 
         public InstapaperLibrary Instapaper { get; internal set; }
@@ -45,21 +56,7 @@ namespace Instapaper
 
         public void Initiate()
         {
-
             SetBookmarks();
-            this.ArticleControl.TextHighlighted += async (s, text) =>
-            {
-                await Instapaper.Highlight(SelectedBookmark, text);
-            };
-
-            SetSidebarVisibility(Window.Current.Bounds.Width);
-
-            Window.Current.SizeChanged += (s, ex) =>
-            {
-                SetSidebarVisibility(ex.Size.Width);
-
-                //this.main.DisplayMode = ApplicationView.GetForCurrentView().IsFullScreenMode ? SplitViewDisplayMode.Overlay : SplitViewDisplayMode.CompactOverlay;
-            };
         }
 
         public void SetSidebarVisibility(double width)
@@ -206,6 +203,10 @@ namespace Instapaper
         private void Article_Loaded(object sender, RoutedEventArgs e)
         {
             ArticleControl = sender as Article;
+            this.ArticleControl.TextHighlighted += async (s, text) =>
+            {
+                await Instapaper.Highlight(SelectedBookmark, text);
+            };
         }
 
         public static string ItemSubheaderUrl(string url) => new Uri(url).Host;

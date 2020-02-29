@@ -8,6 +8,14 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Martijn.Extensions;
+using System.Net.NetworkInformation;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Crashes;
+using HtmlAgilityPack;
+using Windows.Storage;
+using Windows.Web.Http;
+using System.Web;
+using Martijn.Extensions.AsyncLinq;
 
 namespace Instapaper
 {
@@ -32,13 +40,21 @@ namespace Instapaper
             Instapaper = instapaper;
         }
 
-        public async Task<List<Bookmark>> StoreBookmarks(DownloadSettings settings)
+        public async Task StoreBookmarks(DownloadSettings settings)
         {
             List<Bookmark> bms = new List<Bookmark>();
+            bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
+            if(!isInternetConnected)
+            {
+                return;
+            }
+
+
+
             try
             {
                 await ExecuteSavedActions();
-
+                var imagesFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync("Images", CreationCollisionOption.OpenIfExists);
 
                 List<Folder> folders = await Instapaper.GetFolders();
 
@@ -77,21 +93,38 @@ namespace Instapaper
                     {
                         try
                         {
-                            await mem.ReadOrCalculate($"html-{i.bookmark_id}", () => Instapaper.GetHTML(i));
+                            var res = await mem.ReadOrCalculate($"html-{i.bookmark_id}", () => Instapaper.GetHTML(i));
+                            await ExtractAndDownloadImages(res, imagesFolder, i.bookmark_id);
                         }
-                        catch { }
+                        catch(Exception e) {
+                            Crashes.TrackError(e);
+                        }
                         await mem.Write($"highlights-{i.bookmark_id}", bookmarkInfo.highlights.Where(j => j.bookmark_id == i.bookmark_id).ToList());
                     }
                 }
             }
             catch(NoInternetException) {}
 
-            return bms;
         }
 
-        internal async Task MoveBookmark(Bookmark bookmark, string v)
+        public async Task ExtractAndDownloadImages(string html, StorageFolder imagesFolder, int bookmark_id)
         {
-            await TryToExecute(new InstapaperAction
+            var htmlDoc = new HtmlDocument();
+            htmlDoc.LoadHtml(html); 
+            await htmlDoc.DocumentNode.Descendants("img").Select(i => i.Attributes.FirstOrDefault(j => j.Name == "src")).Where(i => i != null).Select(async i =>
+            {
+                HttpClient client = new HttpClient();
+                var res = await client.GetAsync(new Uri(i.Value));
+                //res.Content.ReadAsInputStreamAsync
+                var file = await imagesFolder.CreateFileAsync(bookmark_id + new Uri(i.Value).LocalPath.Replace('/', '-'));
+                await FileIO.WriteBufferAsync(file, await res.Content.ReadAsBufferAsync());
+                return file;
+            }).WhenAll();
+        }
+
+        internal Task MoveBookmark(Bookmark bookmark, string v)
+        {
+            return TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Folder = int.Parse(v)
@@ -109,16 +142,25 @@ namespace Instapaper
 
         public Task<Dictionary<string, string>> GetFolders()
         {
-            return mem.Read<Dictionary<string, string>>("folders.json");
+            return mem.Read("folders.json", new Dictionary<string, string>());
         }
 
         public async Task<List<Bookmark>> GetBookmarks(string folder)
         {
-            try
+
+            bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
+            if (isInternetConnected)
             {
-                return await Instapaper.GetBookmarks(folder, 60);
+                try
+                {
+                    return await Instapaper.GetBookmarks(folder, 60);
+                }
+                catch (NoInternetException)
+                {
+                    return (await mem.Read<BookmarksObject>($"bookmarks-{folder}.json")).bookmarks;
+                }
             }
-            catch
+            else
             {
                 return (await mem.Read<BookmarksObject>($"bookmarks-{folder}.json")).bookmarks;
             }
@@ -132,7 +174,7 @@ namespace Instapaper
             } 
             catch
             {
-                return $"<h1>Not yet downloaded</h1><p>Please wait while we are downloading this article</p>";
+                return $"<h1>Not yet downloaded</h1><p>Still downloading this article</p>";
             }
         }
 
@@ -148,27 +190,27 @@ namespace Instapaper
             }
         }
 
-        public async Task Archive(Bookmark bookmark)
+        public Task Archive(Bookmark bookmark)
         {
-            await TryToExecute(new InstapaperAction
+            return TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Archive
             });
         }
 
-        public async Task Star(Bookmark bookmark)
+        public Task Star(Bookmark bookmark)
         {
-            await TryToExecute(new InstapaperAction
+            return TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Star
             });
         }
 
-        public async Task Delete(Bookmark bookmark)
+        public Task Delete(Bookmark bookmark)
         {
-            await TryToExecute(new InstapaperAction
+            return TryToExecute(new InstapaperAction
             {
                 Bookmark = bookmark.bookmark_id,
                 Action = ActionType.Delete
@@ -186,18 +228,28 @@ namespace Instapaper
             });
         }
 
-
-        internal async Task TryToExecute(InstapaperAction action)
+        public async Task TryOrElse(Task t, Func<Task> t2)
         {
-            try
+            bool isInternetConnected = NetworkInterface.GetIsNetworkAvailable();
+            if (isInternetConnected)
             {
-                await Execute(action);
+                try
+                {
+                    await t;
+                }
+                catch (NoInternetException)
+                {
+                    await t2();
+                }
             }
-            catch(NoInternetException)
+            else
             {
-                await Save(action);
+                await t2();
             }
         }
+
+
+        internal Task TryToExecute(InstapaperAction action) => TryOrElse(Execute(action), () => Save(action));
 
         private async Task Save(InstapaperAction action)
         {

@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Web;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
@@ -57,6 +58,10 @@ namespace Instapaper
             var res = HtmlRichTextBlockv3.SetHtml(RichText, html, null, (e) =>
             {
                 UrlPopupControl.Instance.ShowWithUrl(new Uri(e));
+            },
+            (e) =>
+            {
+                return new Uri("ms-appdata:///local/Images/" + bm.bookmark_id + e.LocalPath.Replace('/','-'));
             });
 
             AllText = RichText.TextUpTo(RichText.ContentEnd);

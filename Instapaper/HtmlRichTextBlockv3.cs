@@ -24,11 +24,13 @@ namespace Instapaper
     {
         public static TypographySettings settings;
         private static Action<string> OnUrl = (e) => { };
+        private static Func<Uri, Uri> ImageUriTransform = (e) => e;
 
-        public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null, Action<string> onUrl = null)
+        public static List<Paragraph> SetHtml(RichTextBlock richText, string html, TypographySettings tsettings = null, Action<string> onUrl = null, Func < Uri, Uri> imageUriTransform = null)
         {
             settings = tsettings ?? TypographySettings.GetDefaultSettings();
             OnUrl = onUrl ?? OnUrl;
+            ImageUriTransform = imageUriTransform ?? ImageUriTransform;
             richText.Blocks.Clear();
 
             try
@@ -396,7 +398,7 @@ namespace Instapaper
                 return null;
             }
 
-            BitmapImage bitmapImage = new BitmapImage(new Uri(href));
+            BitmapImage bitmapImage = new BitmapImage(ImageUriTransform(new Uri(href)));
             var img = new Image
             {
                 Source = bitmapImage,
